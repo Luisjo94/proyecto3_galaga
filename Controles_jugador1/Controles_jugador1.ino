@@ -7,7 +7,7 @@ struct Boton {
 };
 
 //se define lo que hace cada boton (pin, character que representa y su estado actual)
-Boton up = {18, 'W', false};
+Boton up = {25, 'W', false};
 Boton left = {33, 'A', false};
 Boton down = {32, 'S', false};
 Boton right = {35, 'D', false};
@@ -60,7 +60,14 @@ void loop() {
       up.estado = false;
     }
   }
- 
+
+  if (!digitalRead(down.PIN)){
+    down.estado = true;
+    if (digitalRead(down.PIN) && down.estado){
+      Serial.println(down.caracter);
+      down.estado = false;
+    }
+  }
 }
 
 void botones_setup (){
