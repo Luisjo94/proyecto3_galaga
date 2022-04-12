@@ -15,8 +15,8 @@ Boton shoot = {34, 'E', false};
 
 struct Joystick {
   const uint8_t PIN;
-  int volt;
-  const int centro;
+  uint16_t volt;
+  const uint16_t centro;
 };
 //dead zone de 100 en x
 //dead zone de 75 en y
@@ -55,6 +55,8 @@ Joystick ejeY {32, 0, 1892};
 //}
 //
 
+int pendiente;
+
 void setup() {
   Serial.begin(115200);
   
@@ -71,10 +73,29 @@ void loop() {
       shoot.estado = false;
     }
   }
-  ejeX.volt = analogRead (ejeX.PIN);
-  ejeY.volt = analogRead (ejeY.PIN);
 
-  Serial.printf("eje X: %u   eje Y: %u\n", ejeX.volt, ejeY.volt); 
+  //Que letra debe enviar
+  ejeX.volt = analogRead (ejeX.PIN);
+  ejeY.volt = analogRead (ejeY.PIN); //valores en X y Y
+
+  //0,0 ajustado en posicion de descanzo del Joystick
+//  ejeX.mapeo = ejeX.volt - ejeX.centro;
+//  ejeY.mapeo = ejeY.volt - ejeY.centro;
+
+  if (((ejeX.volt < ejeX.centro - 100) && (ejeX.volt > ejeX.centro + 100)) || ((ejeY.volt < ejeY.centro - 100) && (ejeY.volt > ejeY.centro > 100))){
+    
+  
+  if (ejeY.volt != 0) {
+    pendiente = ejeX.volt/ejeY.volt;
+    
+    if (pendiente > 0.5 && pendiente <2){ //SD
+      
+          Serial.println("SD");
+    }
+  }
+  }
+
+  
 }
 
 void input_setup (){
