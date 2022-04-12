@@ -3,7 +3,7 @@ struct Boton {
   const uint8_t PIN;
   char caracter;
   bool estado;
-}
+};
 
 //se define lo que hace cada boton (pin, character que representa y su estado actual)
 Boton up = {25, 'W', false};
@@ -16,6 +16,7 @@ Boton shoot = {34, 'E', false};
 void IRAM_ATTR isr() {
   if (digitalRead(up.PIN)){//se preciono up
     up.estado = true;
+    //Serial.println(up.caracter);
     //lo que queremos que haga
     
   }
@@ -49,7 +50,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
+  if (up.estado){
+    Serial.println(up.caracter);
+    up.estado = false;
+  }
 }
 
 void botones_setup (){
