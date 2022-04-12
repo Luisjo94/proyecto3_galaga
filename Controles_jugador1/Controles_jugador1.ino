@@ -5,8 +5,10 @@ struct Boton {
   bool estado;
 }
 
-Boton up = {25, 
-
+Boton up = {25, 'W', false};
+Boton left = {33, 'A', false};
+Boton down = {32, 'S', false};
+Boton right = {32, 'D', false};
 
 
 void setup() {
