@@ -9,7 +9,8 @@ struct Boton {
 Boton up = {25, 'W', false};
 Boton left = {33, 'A', false};
 Boton down = {32, 'S', false};
-Boton right = {32, 'D', false};
+Boton right = {35, 'D', false};
+Boton shoot = {34, 'E', false};
 
 //************************ Codigo de interrupciones **********************************
 void IRAM_ATTR isr() {
@@ -48,7 +49,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  
 }
 
 void botones_setup (){
