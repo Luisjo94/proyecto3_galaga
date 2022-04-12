@@ -7,11 +7,22 @@ struct Boton {
 };
 
 //se define lo que hace cada boton (pin, character que representa y su estado actual)
-Boton up = {25, 'W', false};
-Boton left = {33, 'A', false};
-Boton down = {32, 'S', false};
-Boton right = {35, 'D', false};
+//Boton up = {25, 'W', false};
+//Boton left = {33, 'A', false};
+//Boton down = {32, 'S', false};
+//Boton right = {35, 'D', false};
 Boton shoot = {34, 'E', false};
+
+struct Joystick {
+  const uint8_t PIN;
+  int volt;
+  const int centro;
+};
+//dead zone de 100 en x
+//dead zone de 75 en y
+Joystick ejeX {33, 0, 1905};
+Joystick ejeY {32, 0, 1892};
+
 
 //************************ Codigo de interrupciones **********************************
 
@@ -47,34 +58,29 @@ Boton shoot = {34, 'E', false};
 void setup() {
   Serial.begin(115200);
   
-  botones_setup();
+  input_setup();
   //interrupt_setup();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (!digitalRead(up.PIN)){
-    up.estado = true;
-    if (digitalRead(up.PIN) && up.estado){
-      Serial.println(up.caracter);
-      up.estado = false;
+  if (!digitalRead(shoot.PIN)){
+    shoot.estado = true;
+    if (digitalRead(shoot.PIN) && shoot.estado){
+      Serial.println(shoot.caracter);
+      shoot.estado = false;
     }
   }
+  ejeX.volt = analogRead (ejeX.PIN);
+  ejeY.volt = analogRead (ejeY.PIN);
 
-  if (!digitalRead(down.PIN)){
-    down.estado = true;
-    if (digitalRead(down.PIN) && down.estado){
-      Serial.println(down.caracter);
-      down.estado = false;
-    }
-  }
+  Serial.printf("eje X: %u   eje Y: %u\n", ejeX.volt, ejeY.volt); 
 }
 
-void botones_setup (){
-  pinMode(up.PIN, INPUT_PULLUP);
-  pinMode(left.PIN, INPUT_PULLUP);
-  pinMode(down.PIN, INPUT_PULLUP);
-  pinMode(right.PIN, INPUT_PULLUP);
+void input_setup (){
+  pinMode(shoot.PIN, INPUT_PULLUP);
+  pinMode(ejeX.PIN, INPUT);
+  pinMode(ejeY.PIN, INPUT);
 }
 
 //void interrupt_setup (){
