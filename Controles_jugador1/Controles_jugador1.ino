@@ -42,7 +42,8 @@ void IRAM_ATTR isr() {
 void setup() {
   Serial.begin(115200);
   
-  attachInterrupt(up.PIN, isr, FALLING);
+  botones_setup();
+  interrupt_setup();
 }
 
 void loop() {
@@ -57,7 +58,7 @@ void botones_setup (){
   pinMode(right.PIN, INPUT_PULLUP);
 }
 
-void interrupt (){
+void interrupt_setup (){
   attachInterrupt(up.PIN, isr, FALLING);
   attachInterrupt(left.PIN, isr, FALLING);
   attachInterrupt(down.PIN, isr, FALLING);
