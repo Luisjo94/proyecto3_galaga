@@ -1,3 +1,7 @@
+#include "BluetoothSerial.h"
+
+BluetoothSerial BT_ESP;
+
 //************************ Variables de palanca **********************************
 struct Boton {
   const uint8_t PIN;
@@ -21,6 +25,10 @@ void IRAM_ATTR ISR(){
 
 void setup() {
   Serial.begin(115200);
+  BT_ESP.begin("ESP32");
+
+
+  
   input_setup();
   attachInterrupt(shoot.PIN, ISR, FALLING);
 }
@@ -28,14 +36,13 @@ void setup() {
 
 
 void loop() {
+//  BT_ESP.println("Hola mundo");
+//  delay(10000);
+
+
+  
   Joy_function(); 
-
-
-  if (digitalRead(shoot.PIN) && shoot.estado){
-    Serial.println(shoot.caracter);
-    shoot.estado = false;
-  }
-  //3.3v > push > pin boton, resistencias > gnd
+  but ();
 }
 
 void input_setup (){
@@ -52,17 +59,30 @@ void Joy_function () {
   //Letra correspondiente de acuerdo a donde se encuentre la palanca
   if (ejeX.volt > 2500){
     Serial.print ("D");
+    BT_ESP.print("D");
   }
 
   if (ejeX.volt < 800) {
     Serial.print ("A");
+    BT_ESP.print("A");
   }
 
   if (ejeY.volt < 800){
     Serial.print ("W");
+    BT_ESP.print("W");
   }
 
   if (ejeY.volt >2500){
     Serial.print ("S");
+    BT_ESP.print("S");
   }
+}
+
+void but () {
+  if (digitalRead(shoot.PIN) && shoot.estado){
+    Serial.println(shoot.caracter);
+    BT_ESP.println(shoot.caracter);
+    shoot.estado = false;
+  }
+  //3.3v > push > pin boton, resistencias > gnd
 }
