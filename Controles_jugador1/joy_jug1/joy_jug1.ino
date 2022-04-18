@@ -8,7 +8,7 @@ struct Boton {
   char caracter;
   bool estado;
 };
-Boton shoot = {19, 'E', false};
+Boton shoot = {18, 'E', 0};
 
 struct Joystick {
   const uint8_t PIN;
@@ -18,9 +18,8 @@ Joystick ejeX {33, 0};
 Joystick ejeY {32, 0};
 
 void IRAM_ATTR ISR(){
-
-  shoot.estado = true;
-
+  shoot.estado = 1;
+  
 }
 
 void setup() {
@@ -30,7 +29,7 @@ void setup() {
 
   
   input_setup();
-  attachInterrupt(shoot.PIN, ISR, FALLING);
+  attachInterrupt(shoot.PIN, ISR, HIGH);
 }
 
 
@@ -49,6 +48,7 @@ void input_setup (){
   pinMode(shoot.PIN, INPUT_PULLUP);
   pinMode(ejeX.PIN, INPUT);
   pinMode(ejeY.PIN, INPUT);
+
 }
 
 void Joy_function () {
@@ -60,29 +60,34 @@ void Joy_function () {
   if (ejeX.volt > 2500){
     Serial.print ("D");
     BT_ESP.print("D");
+    delay(50);
   }
 
   if (ejeX.volt < 800) {
     Serial.print ("A");
     BT_ESP.print("A");
+    delay(50);
   }
 
   if (ejeY.volt < 800){
     Serial.print ("W");
     BT_ESP.print("W");
+    delay(50);
   }
 
   if (ejeY.volt >2500){
     Serial.print ("S");
     BT_ESP.print("S");
+    delay(50);
   }
 }
 
 void but () {
-  if (digitalRead(shoot.PIN) && shoot.estado){
+  if (!digitalRead(shoot.PIN) && shoot.estado){
     Serial.println(shoot.caracter);
     BT_ESP.println(shoot.caracter);
-    shoot.estado = false;
+    shoot.estado = 0;
+    //delay(10);
   }
   //3.3v > push > pin boton, resistencias > gnd
 }
