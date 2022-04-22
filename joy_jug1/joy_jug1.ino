@@ -1,3 +1,11 @@
+
+#include <esp_now.h>
+#include <WiFi.h>
+
+// Address del ESP reseptor
+uint8_t broadcastAddress[] = {0x58, 0xBF, 0x25, 0x17, 0x3E, 0xA8};
+
+
 //************************ Variables de botones **********************************
 struct Boton {
   const uint8_t PIN;
@@ -7,10 +15,6 @@ struct Boton {
 };
 
 //se define lo que hace cada boton (pin, character que representa y su estado actual)
-//Boton up = {25, 'W', false};
-//Boton left = {33, 'A', false};
-//Boton down = {32, 'S', false};
-//Boton right = {35, 'D', false};
 Boton shoot = {34, 'E', false};
 
 struct Joystick {
@@ -18,12 +22,10 @@ struct Joystick {
   uint16_t volt;
   const uint16_t centro;
 };
-//dead zone de 100 en x
-//dead zone de 75 en y
 Joystick ejeX {33, 0, 1905};
 Joystick ejeY {32, 0, 1892};
 
-
+int id =1;
 //************************ Codigo de interrupciones **********************************
 
 //void IRAM_ATTR isr() {
@@ -110,3 +112,6 @@ void input_setup (){
 //  attachInterrupt(down.PIN, isr, FALLING);
 //  attachInterrupt(right.PIN, isr, FALLING);
 //}
+
+//Esclavo
+//ESP Board MAC Address:  58:BF:25:17:3E:A8
