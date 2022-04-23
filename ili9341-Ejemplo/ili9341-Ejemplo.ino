@@ -39,21 +39,40 @@
 //***************************************************************************************************************************************
 // Variables
 //***************************************************************************************************************************************
-int xp1 = 0;
-int yp1 = 170;
-int xp2 = 303;
-int yp2 = 170;
+//------------------- Posicion de naves ---------------------
+struct ship {
+  short ejeX;
+  short ejeY;
+  
+};
+//Posicion inicial de naves jugadores
+ship P1 = {0, 170};
+ship P2 = {303, 170};
+
+//Posicion enemigo
+ship bad1 = {100, 100};
+
+//------------------- disparos ---------------------------
+struct object {
+  short posX;
+  short posY;
+};
+//balas de ambos jugadores
+object bulletP1;
+object bulletP2;
+
+//-------------------- colisiones ---------------------------------
+//struct CColision {
+//  char hit;
+//};
+//CColision P1;
+//CColision P2;
+
+
 
 int colision;
 
-int bullet1x, bullet1y, bullet2x, bullet2y;
-
-int anim2, flip;
-
 unsigned long tiempo;
-
-int enem1x = 200;
-int enem1y = 100;
 
 #define LCD_RST PD_0
 #define LCD_CS PD_1
@@ -76,7 +95,7 @@ void FillRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, un
 void LCD_Print(String text, int x, int y, int fontSize, int color, int background);
 
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
-void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
+//void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
 
 extern uint8_t fondo[];
@@ -131,57 +150,57 @@ void loop() {
 
 // ------------------------------ nave 1 ------------------------------
   //moverse derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && xp1<145)
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX<145)
   {
-    xp1++;  //ir a la derecha
+    P1.ejeX++;  //ir a la derecha
   }
   //moverse izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && xp1>0)
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX>0)
   {
-    xp1--;  //ir a la izquierda
+    P1.ejeX--;  //ir a la izquierda
   }
   //disparar 
   if (digitalRead(SW1)==0 && digitalRead(SW2)==0)
   {
-    bullet1x = xp1+6;
+    bulletP1.posX = P1.ejeX+6;
     //if Ccolision != 1 ñ                             verificar colision antes de continuar trayectoria
     //ñ 
-    for (bullet1y=yp1-8; bullet1y>-8; bullet1y--)
+    for (bulletP1.posY=P1.ejeY-8; bulletP1.posY>-8; bulletP1.posY--)
     {
       delay(1);
-      LCD_Bitmap(bullet1x, bullet1y, 3, 8, bullet);  
+      LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
     }
   }
-    LCD_Bitmap(xp1,yp1,15,15,nave1);
-    V_line( xp1-1, yp1, 15, 0x0);
-    V_line( xp1+16, yp1, 15, 0x0);
-    H_line(xp1, yp1-1, 15, 0x0);
-    H_line(xp1, yp1+15, 15, 0x0);
+    LCD_Bitmap(P1.ejeX,P1.ejeY,15,15,nave1);
+    V_line( P1.ejeX-1, P1.ejeY, 15, 0x0);
+    V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
+    H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
+    H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
 
 // ------------------------------ nave 2 ------------------------------
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && xp2<304)
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P2.ejeX<304)
   {
-    xp2++;
+    P2.ejeX++;
   }
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && xp2>160)
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P2.ejeX>160)
   {
-    xp2--;
+    P2.ejeX--;
   }
   //disparar 
   if (digitalRead(SW1)==0 && digitalRead(SW2)==0)
   {
-    bullet2x = xp2+6;
-    for (bullet2y=yp2-8; bullet2y>-8; bullet2y--)
+    bulletP2.posX = P2.ejeX+6;
+    for (bulletP2.posY=P2.ejeY-8; bulletP2.posY>-8; bulletP2.posY--)
     {
       delay(1);
-      LCD_Bitmap(bullet2x, bullet2y, 3, 8, bullet);
+      LCD_Bitmap(bulletP2.posX, bulletP2.posY, 3, 8, bullet);
     }
   }
-    LCD_Bitmap(xp2,yp2,15,15,nave2);
-    V_line( xp2-1, yp2, 15, 0x0);
-    V_line( xp2+16, yp2, 15, 0x0);
-    H_line(xp2, yp2-1, 15, 0x0);
-    H_line(xp2, yp2+15, 15, 0x0);
+    LCD_Bitmap(P2.ejeX,P2.ejeY,15,15,nave2);
+    V_line( P2.ejeX-1, P2.ejeY, 15, 0x0);
+    V_line( P2.ejeX+16, P2.ejeY, 15, 0x0);
+    H_line(P2.ejeX, P2.ejeY-1, 15, 0x0);
+    H_line(P2.ejeX, P2.ejeY+15, 15, 0x0);
 
 // ------------------------------ enemigo 1 ------------------------------
 //  tiempo = milis();
@@ -196,15 +215,15 @@ void loop() {
 
     if (colision == 0)
     {
-      if ((enem1x <= bullet1x && enem1x+15 >= bullet1x) || (enem1x <= bullet2x && enem1x+15 >= bullet2x))
+      if ((bad1.ejeX <= bulletP1.posX && bad1.ejeX+15 >= bulletP1.posX) || (bad1.ejeX <= bulletP2.posX && bad1.ejeX+15 >= bulletP2.posX))
       {
-      FillRect(enem1x, enem1y, 15, 15, 0x0);
+      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0x0);
       colision = 1;
       }
       else 
       {
       colision = 0;
-      FillRect(enem1x, enem1y, 15, 15, 0xFFFF);
+      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0xFFFF);
       }
     }
     
@@ -527,38 +546,38 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 //***************************************************************************************************************************************
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
 //***************************************************************************************************************************************
-void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset) {
-  LCD_CMD(0x02c); // write_memory_start
-  digitalWrite(LCD_RS, HIGH);
-  digitalWrite(LCD_CS, LOW);
-
-  unsigned int x2, y2;
-  x2 =   x + width;
-  y2 =    y + height;
-  SetWindows(x, y, x2 - 1, y2 - 1);
-  int k = 0;
-  int ancho = ((width * columns));
-  if (flip) {
-    for (int j = 0; j < height; j++) {
-      k = (j * (ancho) + index * width - 1 - offset) * 2;
-      k = k + width * 2;
-      for (int i = 0; i < width; i++) {
-        LCD_DATA(bitmap[k]);
-        LCD_DATA(bitmap[k + 1]);
-        k = k - 2;
-      }
-    }
-  } else {
-    for (int j = 0; j < height; j++) {
-      k = (j * (ancho) + index * width + 1 + offset) * 2;
-      for (int i = 0; i < width; i++) {
-        LCD_DATA(bitmap[k]);
-        LCD_DATA(bitmap[k + 1]);
-        k = k + 2;
-      }
-    }
-
-
-  }
-  digitalWrite(LCD_CS, HIGH);
-}
+//void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset) {
+//  LCD_CMD(0x02c); // write_memory_start
+//  digitalWrite(LCD_RS, HIGH);
+//  digitalWrite(LCD_CS, LOW);
+//
+//  unsigned int x2, y2;
+//  x2 =   x + width;
+//  y2 =    y + height;
+//  SetWindows(x, y, x2 - 1, y2 - 1);
+//  int k = 0;
+//  int ancho = ((width * columns));
+////  if (flip) {
+////    for (int j = 0; j < height; j++) {
+////      k = (j * (ancho) + index * width - 1 - offset) * 2;
+////      k = k + width * 2;
+////      for (int i = 0; i < width; i++) {
+////        LCD_DATA(bitmap[k]);
+////        LCD_DATA(bitmap[k + 1]);
+////        k = k - 2;
+////      }
+////    }
+////  } else {
+////    for (int j = 0; j < height; j++) {
+////      k = (j * (ancho) + index * width + 1 + offset) * 2;
+////      for (int i = 0; i < width; i++) {
+////        LCD_DATA(bitmap[k]);
+////        LCD_DATA(bitmap[k + 1]);
+////        k = k + 2;
+////      }
+////    }
+//
+//
+//  }
+//  digitalWrite(LCD_CS, HIGH);
+//}
