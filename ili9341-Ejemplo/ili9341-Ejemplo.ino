@@ -150,12 +150,12 @@ void loop() {
 
 // ------------------------------ nave 1 ------------------------------
   //moverse derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX<145)
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0)
   {
     P1.ejeX++;  //ir a la derecha
   }
   //moverse izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX>0)
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1)
   {
     P1.ejeX--;  //ir a la izquierda
   }
@@ -163,9 +163,8 @@ void loop() {
   if (digitalRead(SW1)==0 && digitalRead(SW2)==0)
   {
     bulletP1.posX = P1.ejeX+6;
-    //if Ccolision != 1 ñ                             verificar colision antes de continuar trayectoria
-    //ñ 
-    for (bulletP1.posY=P1.ejeY-8; bulletP1.posY>-8; bulletP1.posY--)
+
+    for (bulletP1.posY = P1.ejeY-8; bulletP1.posY > -8; bulletP1.posY--)
     {
       delay(1);
       LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
@@ -178,11 +177,11 @@ void loop() {
     H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
 
 // ------------------------------ nave 2 ------------------------------
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P2.ejeX<304)
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0)
   {
     P2.ejeX++;
   }
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P2.ejeX>160)
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1)
   {
     P2.ejeX--;
   }
