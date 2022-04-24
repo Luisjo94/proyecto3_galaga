@@ -53,30 +53,40 @@ char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 struct ship {
   short ejeX;
   short ejeY;
-  
+  const char  alto;
+  const char  ancho;
 };
 //Posicion inicial de naves jugadores
-ship P1 = {0, 170};
-ship P2 = {303, 170};
+ship P1 = {0, 170, 15, 15};
+ship P2 = {303, 170, 15, 15};
 
 //Posicion enemigo
 ship bad1 = {100, 100};
 
 //------------------- disparos ---------------------------
-
+struct object {
+  short posX;
+  short posY;
+  char  active;
+  char  hit;
+};
+                                               
 //balas de ambos jugadores
 object bulletP1;
+
 object bulletP2;
 
 
+//------------------- limites ---------------------------
+struct Bound {
+  short widthMin;
+  short widthMax;
+  short heightMin;
+  short heightMax;
+};
+Bound player;
+
 //-------------------- colisiones ---------------------------------
-//struct CColision {
-//  char hit;
-//};
-//CColision P1;
-//CColision P2;
-
-
 
 int colision;
 
@@ -125,7 +135,9 @@ void setup() {
 
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
-
+  //inicial
+  player = {0, 303, 145, 170};
+  LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
   
 
 
@@ -168,10 +180,17 @@ void loop() {
       //nave para seleccionar jugadores
       if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303){
         P1.ejeX++;  //ir a la derecha
+        LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+        V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
+        V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
+        
       }
       //moverse izquierda
       if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
         P1.ejeX--;  //ir a la izquierda
+        LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+        V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
+        V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
       }
 
       
@@ -195,20 +214,24 @@ void loop() {
 
       //la bala esta activa y golpeo algo
       if (bulletP1.active && !bulletP1.hit){
-        delay(1);
-        bulletP1.posY--;
-        LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+        if (bulletP1.posY < -8){
+          bulletP1.active = 0;
+        }
+        else {
+          delay(1);
+          bulletP1.posY--;
+          LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+        }
+        
       }
 
+      
       //hacer un hitbox para los cuadros
             
-
       
-        LCD_Bitmap(P1.ejeX,P1.ejeY,15,15,nave1);
-        V_line( P1.ejeX-1, P1.ejeY, 15, 0x0);
-        V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
-        H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
-        H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
+        
+        //H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
+        //H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
       break;
 
     default: //pantalla de incio
@@ -246,52 +269,7 @@ void loop() {
     V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
     H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
     H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
-
-// ------------------------------ nave 2 ------------------------------
-  //derecha
-//  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P2.ejeX < 303)
-//  {
-//    P2.ejeX++;
-//  }
-//
-//  //izquierda
-//  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P2.ejeX > 0)
-//  {
-//    P2.ejeX--;
-//  }
-//  //disparar 
-//  if (digitalRead(SW1)==0 && digitalRead(SW2)==0)
-//  {
-//    bulletP2.posX = P2.ejeX+6;
-//    for (bulletP2.posY=P2.ejeY-8; bulletP2.posY>-8; bulletP2.posY--)
-//    {
-//      delay(1);
-//      LCD_Bitmap(bulletP2.posX, bulletP2.posY, 3, 8, bullet);
-//    }
-//  }
-//    LCD_Bitmap(P2.ejeX,P2.ejeY,15,15,nave2);
-//    V_line( P2.ejeX-1, P2.ejeY, 15, 0x0);
-//    V_line( P2.ejeX+16, P2.ejeY, 15, 0x0);
-//    H_line(P2.ejeX, P2.ejeY-1, 15, 0x0);
-//    H_line(P2.ejeX, P2.ejeY+15, 15, 0x0);
-
-// ------------------------------ enemigo 1 ------------------------------
-//
-//    if (colision == 0)
-//    {
-//      if ((bad1.ejeX <= bulletP1.posX && bad1.ejeX+15 >= bulletP1.posX) || (bad1.ejeX <= bulletP2.posX && bad1.ejeX+15 >= bulletP2.posX))
-//      {
-//      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0x0);
-//      colision = 1;
-//      }
-//      else 
-//      {
-//      colision = 0;
-//      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0xFFFF);
-//      }
-//    }    
 }
-
 //***************************************************************************************************************************************
 // Función para menu de incio
 //***************************************************************************************************************************************
@@ -309,6 +287,8 @@ void Menu (){
   LCD_Print ("Duos", 210, 40, 2, 0xFFFF, 0x0);
   LCD_Bitmap (215, 90, 15, 15, nave1);
   LCD_Bitmap (245, 90, 15, 15, nave2);
+
+  
 }
 
 
