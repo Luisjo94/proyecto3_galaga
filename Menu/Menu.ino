@@ -75,13 +75,13 @@ struct object {
   char  alto;
   char  active;
   char  hit;
-  unsigned short previo;
-  unsigned short intervalo;
+  unsigned long previo;
+  unsigned long intervalo;
 };
                                                
 //balas de ambos jugadores
-struct object bulletP1;
-struct object bulletP2;
+struct object bulletP1 = {0,0, 3, 8, 0, 0, 0, 2};
+struct object bulletP2 = bulletP1;
 
 
 //------------------- limites ---------------------------
@@ -99,6 +99,10 @@ struct Menu {
   short width;
   short height;
 };
+
+
+//------------------- tiempo --------------------------
+
 
 #define LCD_RST PD_0
 #define LCD_CS PD_1
@@ -135,6 +139,9 @@ void SetupDuos (void);
 void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX);
 void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY);
 
+//-------------------- tiempo -------------------------------------
+unsigned long currentMillis;
+
 
 //***************************************************************************************************************************************
 // Inicialización
@@ -155,9 +162,10 @@ void setup() {
   player = {0, 303, 145, 170};
   LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
   
-  bulletP1.intervalo = 1;
-  bulletP1.largo = 3;
-  bulletP1.alto = 8;
+  //bulletP1.intervalo = 1;
+  //bulletP2.intervalo = 1;
+  //bulletP1.largo = 3;
+  //bulletP1.alto = 8;
 }
 
 
@@ -165,7 +173,7 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
-  unsigned long currentMillis = millis();
+  
   
   switch (estado_juego) { 
     case 0: //pantalla de inicio
@@ -178,6 +186,8 @@ void loop() {
       
       //la bala esta activa y no a golpeado nada
       if (bulletP1.active && !bulletP1.hit){
+        currentMillis = millis();
+        
         //se salio de la pantalla
         if (bulletP1.posY < -8){
           FillRect (bulletP1.posX, bulletP1.posY, bulletP1.largo, bulletP1.alto, 0x0000);
@@ -186,7 +196,7 @@ void loop() {
         }
         //esta dentro de la pantalla pero no ha golpeado nada
         else {
-          if (currentMillis - bulletP1.previo > bulletP1.intervalo){
+          if (currentMillis - bulletP1.previo >= bulletP1.intervalo){
             bulletP1.previo = currentMillis;
             bulletP1.posY--;
             LCD_Bitmap(bulletP1.posX, bulletP1.posY, bulletP1.largo, bulletP1.alto, bullet);  
@@ -289,7 +299,6 @@ void SetupSolo () {
   P1.ejeX = 155;
   P1.ejeY = 170;
   LCD_Bitmap (P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-  currentMillis = 0;
 }
 
 void SetupDuos (){
