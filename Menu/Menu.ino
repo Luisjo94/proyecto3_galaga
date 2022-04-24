@@ -301,12 +301,6 @@ void loop() {
         bulletP1.hit = 0;
         P1.score++;
       }
-
-      if (P1.score == 3)
-      {
-        P1.vidas = 0;
-        bulletP1.hit = 1;
-      }
       
       
 
@@ -445,7 +439,7 @@ void Menu (){
   //320x240
   //titulo del juego
   LCD_Bitmap (62, 15, 195, 30, titulo);
-  //LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
+  LCD_Print ("Shoot to select a game mode", 40, 210, 1, 0xFFFF, 0x0);
 
   //Ventana un jugador
   Rect (10, 70, 140, 65, 0xFFFF);
@@ -489,7 +483,7 @@ void SetupDuos () {
 // ********** text **********
 // LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
  LCD_Print("Score:", 5, 195, 1, 0xFFFF, 0x0000);
- LCD_Print("Score:", 250, 195, 1, 0xFFFF, 0x0000);
+ LCD_Print("Score:", 240, 195, 1, 0xFFFF, 0x0000);
 
 // ********** vidas J1 **********
  LCD_Bitmap(5,210,15,15,nave1);
@@ -587,7 +581,7 @@ void ScoreDuosMode(int scorej1, int scorej2)
   //j1
   LCD_Print(String(scorej1), 55, 195, 1, 0xFFFF, 0x0);
   //j2
-  LCD_Print(String(scorej2), 300, 195, 1, 0xFFFF, 0x0);
+  LCD_Print(String(scorej2), 290, 195, 1, 0xFFFF, 0x0);
 }
 
 
