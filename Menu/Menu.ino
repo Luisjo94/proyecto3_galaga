@@ -70,13 +70,16 @@ ship bad1 = {100, 100};
 struct object {
   short posX;
   short posY;
+  char  largo;
+  char  alto;
   char  active;
   char  hit;
+  unsigned short previo;
+  unsigned short intervalo;
 };
                                                
 //balas de ambos jugadores
 object bulletP1;
-
 object bulletP2;
 
 
@@ -87,14 +90,21 @@ struct Bound {
   short heightMin;
   short heightMax;
 };
-Bound player;
+Bound player = {0, 304, 0, 224};
+
+struct Menu {
+  short startX;
+  short startY;
+  short width;
+  short height;
+};
+
+
+
+
+
 
 //-------------------- colisiones ---------------------------------
-
-int colision;
-
-unsigned long previousMillis;
-long intervalo = 1;
 
 #define LCD_RST PD_0
 #define LCD_CS PD_1
@@ -139,9 +149,14 @@ void setup() {
 
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
-  //inicial
+  
+  //Menu inicial
   player = {0, 303, 145, 170};
   LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+  
+  bulletP1.intervalo = 1;
+  bulletP1.largo = 3;
+  bulletP1.alto = 8;
   
 
 
@@ -185,50 +200,54 @@ void loop() {
     case 0: //pantalla de inicio
     
       //nave para seleccionar jugadores
-      if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303){
+      if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < player.widthMax){
         P1.ejeX++;  //ir a la derecha
         LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
         V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
         V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);        
       }
       //moverse izquierda
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > player.widthMin){
         P1.ejeX--;  //ir a la izquierda
         LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
         V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
         V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
       }
 
-      
-      //utilizar puntero con todas las funciones
-
+      //la bala esta activa y no a golpeado nada
       if (bulletP1.active && !bulletP1.hit){
+        //se salio de la pantalla
         if (bulletP1.posY < -8){
-        FillRect (bulletP1.posX, bulletP1.posY, 3, 8, 0x0000);
-        bulletP1.active = 0;
-        bulletP1.hit = 0;
+          FillRect (bulletP1.posX, bulletP1.posY, bulletP1.largo, bulletP1.alto, 0x0000);
+          bulletP1.active = 0;
+          bulletP1.hit = 0;
         }
+        //esta dentro de la pantalla pero no ha golpeado nada
         else {
-          if (currentMillis - previousMillis > intervalo){
-            previousMillis = currentMillis;
+          if (currentMillis - bulletP1.previo > bulletP1.intervalo){
+            bulletP1.previo = currentMillis;
             bulletP1.posY--;
-            LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+            LCD_Bitmap(bulletP1.posX, bulletP1.posY, bulletP1.largo, bulletP1.alto, bullet);  
           }
         }
       }
       
       //disparar 
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==0 && bulletP1.active == 0){// condicion de disparo
-        
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==0 && bulletP1.active == 0){// condicion de disparo 
         bulletP1.posX = P1.ejeX+6;
         bulletP1.posY = P1.ejeY-8;
         bulletP1.active = 1;
         bulletP1.hit = 0;
       }
+      //hitbox menu
+
+      if (bulletP1.posY = 135){
+        if (bulletP1.posX <= 147 || bulletP1.posX >= 10){
+          //bulletP1.hit 
+        }
+      }
       
-      //hacer un hitbox para los cuadros
-      //si la bala esta en el rango que cambie de opcion de juego
-      //al golpear hacer que hit = 1
+
       break;
 
     default: //pantalla de incio
