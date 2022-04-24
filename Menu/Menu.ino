@@ -453,10 +453,10 @@ void Menu (){
   LCD_Bitmap (70, 100, 15, 15, nave1);
   
   //ventana dos jugadores
-  Rect (170, 70, 140, 65, 0xFFFF);
-  LCD_Print ("Duos", 210, 62, 2, 0xFFFF, 0x0);
-  LCD_Bitmap (215, 100, 15, 15, nave1);
-  LCD_Bitmap (245, 100, 15, 15, nave2);
+  Rect (168, 70, 140, 65, 0xFFFF);
+  LCD_Print ("Duos", 208, 62, 2, 0xFFFF, 0x0);
+  LCD_Bitmap (213, 100, 15, 15, nave1);
+  LCD_Bitmap (243, 100, 15, 15, nave2);
 }
 
 void SetupSolo () {
