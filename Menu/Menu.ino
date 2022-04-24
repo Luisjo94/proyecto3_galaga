@@ -39,6 +39,16 @@
 //***************************************************************************************************************************************
 // Variables
 //***************************************************************************************************************************************
+//------------------- Estado del juego ----------------------
+char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
+// 1, solo
+// 2, duos
+// 3, endgame
+//  3.1 tiene highscore
+//  3.2 no tiene highscore
+
+
+
 //------------------- Posicion de naves ---------------------
 struct ship {
   short ejeX;
@@ -60,6 +70,7 @@ struct object {
 //balas de ambos jugadores
 object bulletP1;
 object bulletP2;
+
 
 //-------------------- colisiones ---------------------------------
 //struct CColision {
@@ -155,6 +166,59 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
+  switch (estado_juego) { 
+    case 0: //pantalla de inicio
+      //nave para seleccionar jugadores
+      if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303){
+        P1.ejeX++;  //ir a la derecha
+      }
+      //moverse izquierda
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
+        P1.ejeX--;  //ir a la izquierda
+      }
+      //disparar 
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==0){
+        bulletP1.posX = P1.ejeX+6;
+    
+        for (bulletP1.posY = P1.ejeY-8; bulletP1.posY > -8; bulletP1.posY--){
+          delay(1);
+          LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+        }
+      }
+        LCD_Bitmap(P1.ejeX,P1.ejeY,15,15,nave1);
+        V_line( P1.ejeX-1, P1.ejeY, 15, 0x0);
+        V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
+        H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
+        H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
+      break;
+
+    default: //pantalla de incio
+      //nave para seleccionar jugadores
+      if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303){
+        P1.ejeX++;  //ir a la derecha
+      }
+      //moverse izquierda
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
+        P1.ejeX--;  //ir a la izquierda
+      }
+      //disparar 
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==0){
+        bulletP1.posX = P1.ejeX+6;
+    
+        for (bulletP1.posY = P1.ejeY-8; bulletP1.posY > -8; bulletP1.posY--){
+          delay(1);
+          LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+        }
+      }
+        LCD_Bitmap(P1.ejeX,P1.ejeY,15,15,nave1);
+        V_line( P1.ejeX-1, P1.ejeY, 15, 0x0);
+        V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
+        H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
+        H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
+      break;
+      
+    
+  }
 
 // ------------------------------ nave 1 ------------------------------
   //moverse derecha
@@ -237,7 +301,6 @@ void Menu (){
   //titulo del juego
   LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
 
-  
   //Ventana un jugador
   Rect (10, 60, 140, 75, 0xFFFF);
   LCD_Print ("Solo", 50, 40, 2, 0xFFFF, 0x0); 
