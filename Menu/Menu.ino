@@ -61,11 +61,11 @@ struct ship {
   const char  ancho;
 };
 //Posicion inicial de naves jugadores
-ship P1 = {0, 170, 15, 15};
-ship P2 = {303, 170, 15, 15};
+struct ship P1 = {0, 170, 15, 15};
+struct ship P2 = {303, 170, 15, 15};
 
 //Posicion enemigo
-ship bad1 = {100, 100};
+struct ship bad1 = {100, 100};
 
 //------------------- disparos ---------------------------
 struct object {
@@ -80,8 +80,8 @@ struct object {
 };
                                                
 //balas de ambos jugadores
-object bulletP1;
-object bulletP2;
+struct object bulletP1;
+struct object bulletP2;
 
 
 //------------------- limites ---------------------------
@@ -91,7 +91,7 @@ struct Bound {
   short heightMin;
   short heightMax;
 };
-Bound player = {0, 304, 0, 224};
+struct Bound player = {0, 304, 0, 224};
 
 struct Menu {
   short startX;
@@ -123,11 +123,14 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
 //void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
+
+
+extern uint8_t fondo[];
+
+//-------------------- prototipo de funciones --------------------------------------------
 void Menu(void);
 void SetupSolo (void);
 void SetupDuos (void);
-
-extern uint8_t fondo[];
 
 
 
@@ -212,13 +215,13 @@ void loop() {
       //hitbox menu
 
       if (bulletP1.posY == 135){
-        if (bulletP1.posX <= 150 - bulletP1.largo && bulletP1.posX >= 10){
+        if (bulletP1.posX <= 150 - bulletP1.largo && bulletP1.posX >= 7){
           estado_juego = 1;
           bulletP1.hit = 1;
           start = 1;
         }
 
-        if (bulletP1.posX <= 310 - bulletP1.largo && bulletP1.posX >= 170){
+        if (bulletP1.posX <= 315 - bulletP1.largo && bulletP1.posX >= 169){
           estado_juego = 2;
           bulletP1.hit = 1;
           start = 1;
@@ -237,7 +240,7 @@ void loop() {
 
       case 2:
         if (start){
-          SetupSolo (); //cambiar a duos despues
+          SetupDuos (); //cambiar a duos despues
           start = 0;
         }
 
@@ -262,7 +265,7 @@ void Menu (){
   //LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
 
   //Ventana un jugador
-  Rect (10, 70, 140, 65, 0xFFFF);
+  Rect (7, 70, 143, 65, 0xFFFF);
   LCD_Print ("Solo", 50, 62, 2, 0xFFFF, 0x0); 
   LCD_Bitmap (70, 100, 15, 15, nave1);
   
@@ -278,29 +281,28 @@ void SetupSolo () {
   LCD_Clear(0x0);
   H_line(0, 191, 319, 0xFFFF);
 
-  
- // ********** text **********
-//
-// LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
-// LCD_Print("Jugador 1", 5, 195, 1, 0xFFFF, 0x0000);
-// LCD_Print("Jugador 2", 245, 195, 1, 0xFFFF, 0x0000);
-//
-// // ********** vidas J1 **********
-// //LCD_Print("Vidas: x3", 5, 210, 1, 0xFFFF, 0x0000);
-// LCD_Bitmap(5,210,15,15,nave1);
-// LCD_Bitmap(22,210,15,15,nave1);
-// LCD_Bitmap(39,210,15,15,nave1);
-// // ********** vidas J2 **********
-// //LCD_Print("Vidas: x3", 245, 210, 1, 0xFFFF, 0x0000);
-// LCD_Bitmap(265,210,15,15,nave2);
-// LCD_Bitmap(282,210,15,15,nave2);
-// LCD_Bitmap(299,210,15,15,nave2);
-//
-// // ********** division **********
-// H_line(0, 191, 319, 0xFFFF);
- //V_line(160, 0, 239, 0xFFFF);
+  LCD_Bitmap(5,210,15,15,nave1);
+  LCD_Bitmap(22,210,15,15,nave1);
+  LCD_Bitmap(39,210,15,15,nave1);
+
+  LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
 }
 
+void SetupDuos (){
+  LCD_Clear(0x0);
+  H_line(0, 191, 319, 0xFFFF);
+
+  LCD_Bitmap(5,210,15,15,nave1);
+  LCD_Bitmap(22,210,15,15,nave1);
+  LCD_Bitmap(39,210,15,15,nave1);
+
+  LCD_Bitmap(265,210,15,15,nave2);
+  LCD_Bitmap(282,210,15,15,nave2);
+  LCD_Bitmap(299,210,15,15,nave2);
+  
+  LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+
+}
 
 
 
