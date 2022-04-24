@@ -86,10 +86,10 @@ struct object bulletP2;
 
 //------------------- limites ---------------------------
 struct Bound {
-  short widthMin;
-  short widthMax;
-  short heightMin;
-  short heightMax;
+  short xMin;
+  short xMax;
+  short yMin;
+  short yMax;
 };
 struct Bound player = {0, 304, 0, 224};
 
@@ -132,7 +132,7 @@ void Menu(void);
 void SetupSolo (void);
 void SetupDuos (void);
 
-void mover_nave (void);
+void mover_nave_jugador (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX);
 
 
 
@@ -170,20 +170,8 @@ void loop() {
   switch (estado_juego) { 
     case 0: //pantalla de inicio
     
-      //mover a la derecha
-      if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < player.widthMax){
-        P1.ejeX++;  //ir a la derecha
-        LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-        V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
-        V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);        
-      }
-      //moverse izquierda
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > player.widthMin){
-        P1.ejeX--;  //ir a la izquierda
-        LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-        V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
-        V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
-      }
+    //mover_nave_jugador (nombre del bitmap, ancho, alto, *posicionX, posicionY, minimoX, maximoX)
+      mover_nave_jugador (nave1, 15, 15, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
 
       //la bala esta activa y no a golpeado nada
       if (bulletP1.active && !bulletP1.hit){
@@ -308,20 +296,23 @@ void SetupDuos (){
   LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
 }
 
-void mover_nave_jugador (char tipo, short *posicionX, *posicionY, ){
+
+//atento a habilitar la condicional de movimiento
+void mover_nave_jugador (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX){
   //mover a la derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < player.widthMax){
-    P1.ejeX++;  //ir a la derecha
-    LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-    V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
-    V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);        
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionX < maxiX){
+    (*posicionX)++;
+    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+    V_line((*posicionX) - 1, posicionY, ancho ,0x0);
+    V_line((*posicionX) + 16, posicionY, ancho ,0x0);
   }
-  //moverse izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > player.widthMin){
-    P1.ejeX--;  //ir a la izquierda
-    LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-    V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
-    V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
+
+  //mover izquierda
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionX > miniX){
+    (*posicionX)--;
+    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+    V_line(*posicionX - 1, posicionY, ancho ,0x0);
+    V_line(*posicionX + 16, posicionY, ancho ,0x0);
   }
 }
 
