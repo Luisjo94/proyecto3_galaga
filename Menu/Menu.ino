@@ -132,6 +132,8 @@ void Menu(void);
 void SetupSolo (void);
 void SetupDuos (void);
 
+void mover_nave (void);
+
 
 
 //***************************************************************************************************************************************
@@ -156,10 +158,6 @@ void setup() {
   bulletP1.intervalo = 1;
   bulletP1.largo = 3;
   bulletP1.alto = 8;
-  
-
-
-
 }
 
 
@@ -172,7 +170,7 @@ void loop() {
   switch (estado_juego) { 
     case 0: //pantalla de inicio
     
-      //nave para seleccionar jugadores
+      //mover a la derecha
       if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < player.widthMax){
         P1.ejeX++;  //ir a la derecha
         LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
@@ -241,6 +239,8 @@ void loop() {
         }
 
         
+
+        
       break;
 
       case 2:
@@ -306,9 +306,24 @@ void SetupDuos (){
   LCD_Bitmap(299,210,15,15,nave2);
   
   LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
-
 }
 
+void mover_nave_jugador (char tipo, short *posicionX, *posicionY, ){
+  //mover a la derecha
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < player.widthMax){
+    P1.ejeX++;  //ir a la derecha
+    LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+    V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
+    V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);        
+  }
+  //moverse izquierda
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > player.widthMin){
+    P1.ejeX--;  //ir a la izquierda
+    LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+    V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
+    V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
+  }
+}
 
 
 
