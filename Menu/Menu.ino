@@ -63,10 +63,7 @@ ship P2 = {303, 170};
 ship bad1 = {100, 100};
 
 //------------------- disparos ---------------------------
-struct object {
-  short posX;
-  short posY;
-};
+
 //balas de ambos jugadores
 object bulletP1;
 object bulletP2;
@@ -176,15 +173,37 @@ void loop() {
       if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
         P1.ejeX--;  //ir a la izquierda
       }
+
+      
+      //utilizar puntero con todas las funciones
+
+      
       //disparar 
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==0){
-        bulletP1.posX = P1.ejeX+6;
-    
-        for (bulletP1.posY = P1.ejeY-8; bulletP1.posY > -8; bulletP1.posY--){
-          delay(1);
-          LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
-        }
+      if (digitalRead(SW1)==0 && digitalRead(SW2)==0 && bulletP1.active == 0){// condicion de disparo
+        bulletP1 = {P1.ejeX+6, P1.ejeY-8, 1, 0};
+        //Posiciones iniciales de la bala 0,1
+        //estado activo del objeto
+        //colision del objeto
       }
+
+      //la bala esta activa y golpeo algo
+      if (bulletP1.active && bulletP1.hit){
+        FillRect (bulletP1.posX, bulletP1.posY, 3, 8, 0x0000);
+        bulletP1.active = 0;
+        bulletP1.hit = 1;
+      }
+
+      //la bala esta activa y golpeo algo
+      if (bulletP1.active && !bulletP1.hit){
+        delay(1);
+        bulletP1.posY--;
+        LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+      }
+
+      //hacer un hitbox para los cuadros
+            
+
+      
         LCD_Bitmap(P1.ejeX,P1.ejeY,15,15,nave1);
         V_line( P1.ejeX-1, P1.ejeY, 15, 0x0);
         V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
@@ -194,27 +213,7 @@ void loop() {
 
     default: //pantalla de incio
       //nave para seleccionar jugadores
-      if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303){
-        P1.ejeX++;  //ir a la derecha
-      }
-      //moverse izquierda
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
-        P1.ejeX--;  //ir a la izquierda
-      }
-      //disparar 
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==0){
-        bulletP1.posX = P1.ejeX+6;
-    
-        for (bulletP1.posY = P1.ejeY-8; bulletP1.posY > -8; bulletP1.posY--){
-          delay(1);
-          LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
-        }
-      }
-        LCD_Bitmap(P1.ejeX,P1.ejeY,15,15,nave1);
-        V_line( P1.ejeX-1, P1.ejeY, 15, 0x0);
-        V_line( P1.ejeX+16, P1.ejeY, 15, 0x0);
-        H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
-        H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
+      //escribir que el cartucho esta corrupto
       break;
       
     
