@@ -214,7 +214,7 @@ void loop() {
       }
       //hitbox menu
 
-      if (bulletP1.posY == 135){
+      if (bulletP1.posY <= 135){
         if (bulletP1.posX <= 150 - bulletP1.largo && bulletP1.posX >= 7){
           estado_juego = 1;
           bulletP1.hit = 1;
@@ -225,8 +225,13 @@ void loop() {
           estado_juego = 2;
           bulletP1.hit = 1;
           start = 1;
-        }
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
       }
+
+//      if (bulletP1.posY <=45){
+//        //activar EE
+//        LCD_Bitmap (10, 10, 87, 100, malhit);
+//      }
       break;
 
       case 1:
