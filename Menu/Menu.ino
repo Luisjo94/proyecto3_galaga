@@ -234,15 +234,19 @@ void loop() {
 //***************************************************************************************************************************************
 void Menu (){
   //320x240
+  //titulo del juego
+  LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
+
+  
   //Ventana un jugador
-  Rect (10, 10, 140, 125, 0xFFFF);
+  Rect (10, 60, 140, 75, 0xFFFF);
   LCD_Print ("Solo", 50, 40, 2, 0xFFFF, 0x0); 
-  LCD_Bitmap (70, 70, 15, 15, nave1);
+  LCD_Bitmap (70, 90, 15, 15, nave1);
   //ventana dos jugadores
-  Rect (170, 10, 140, 125, 0xFFFF);
+  Rect (170, 60, 140, 75, 0xFFFF);
   LCD_Print ("Duos", 210, 40, 2, 0xFFFF, 0x0);
-  LCD_Bitmap (200, 70, 15, 15, nave1);
-  LCD_Bitmap (225, 70, 15, 15, nave2);
+  LCD_Bitmap (215, 90, 15, 15, nave1);
+  LCD_Bitmap (245, 90, 15, 15, nave2);
 }
 
 
