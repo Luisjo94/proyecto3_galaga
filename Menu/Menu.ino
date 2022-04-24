@@ -251,7 +251,7 @@ void loop() {
 void Menu (){
   //320x240
   //titulo del juego
-  LCD_Bitmap (5, 15, 194, 29, titulo);
+  LCD_Bitmap (75, 150, 195, 30, titulo);
   //LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
 
   //Ventana un jugador
