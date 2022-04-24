@@ -181,8 +181,8 @@ void loop() {
       mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
 
 
-
-      //void disparo (unsigned char tipo [], char vuela, char golpeo, 
+      //se supone que ambos tipos de bala son iguales, largo y alto no cambian y posX es constante, posY cambia, tiempo previo, intervalo 
+      //void disparo (unsigned char tipo [], char *active, char *hit, char largo, char alto, short posicionX, short *posicionY, char  
       
       //la bala esta activa y no a golpeado nada
       if (bulletP1.active && !bulletP1.hit){
