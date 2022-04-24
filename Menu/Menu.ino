@@ -93,7 +93,8 @@ Bound player;
 
 int colision;
 
-unsigned long tiempo;
+unsigned long previousMillis;
+long intervalo = 1;
 
 #define LCD_RST PD_0
 #define LCD_CS PD_1
@@ -178,15 +179,17 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
+  unsigned long currentMillis = millis();
+  
   switch (estado_juego) { 
     case 0: //pantalla de inicio
+    
       //nave para seleccionar jugadores
       if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303){
         P1.ejeX++;  //ir a la derecha
         LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
         V_line( P1.ejeX-1, P1.ejeY, P1.ancho, 0x0);
-        V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);
-        
+        V_line( P1.ejeX+16, P1.ejeY, P1.ancho, 0x0);        
       }
       //moverse izquierda
       if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0){
@@ -199,42 +202,33 @@ void loop() {
       
       //utilizar puntero con todas las funciones
 
+      if (bulletP1.active && !bulletP1.hit){
+        if (bulletP1.posY < -8){
+        FillRect (bulletP1.posX, bulletP1.posY, 3, 8, 0x0000);
+        bulletP1.active = 0;
+        bulletP1.hit = 0;
+        }
+        else {
+          if (currentMillis - previousMillis > intervalo){
+            previousMillis = currentMillis;
+            bulletP1.posY--;
+            LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
+          }
+        }
+      }
       
       //disparar 
       if (digitalRead(SW1)==0 && digitalRead(SW2)==0 && bulletP1.active == 0){// condicion de disparo
-        bulletP1 = {P1.ejeX+6, P1.ejeY-8, 1, 0};
-        //Posiciones iniciales de la bala 0,1
-        //estado activo del objeto
-        //colision del objeto
-      }
-
-      //la bala esta activa y golpeo algo
-      if (bulletP1.active && bulletP1.hit){
-        FillRect (bulletP1.posX, bulletP1.posY, 3, 8, 0x0000);
-        bulletP1.active = 0;
-        bulletP1.hit = 1;
-      }
-
-      //la bala esta activa y golpeo algo
-      if (bulletP1.active && !bulletP1.hit){
-        if (bulletP1.posY < -8){
-          bulletP1.active = 0;
-        }
-        else {
-          delay(1);
-          bulletP1.posY--;
-          LCD_Bitmap(bulletP1.posX, bulletP1.posY, 3, 8, bullet);  
-        }
         
+        bulletP1.posX = P1.ejeX+6;
+        bulletP1.posY = P1.ejeY-8;
+        bulletP1.active = 1;
+        bulletP1.hit = 0;
       }
-
       
       //hacer un hitbox para los cuadros
-            
-      
-        
-        //H_line(P1.ejeX, P1.ejeY-1, 15, 0x0);
-        //H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
+      //si la bala esta en el rango que cambie de opcion de juego
+      //al golpear hacer que hit = 1
       break;
 
     default: //pantalla de incio
@@ -251,18 +245,19 @@ void loop() {
 void Menu (){
   //320x240
   //titulo del juego
-  LCD_Bitmap (75, 150, 195, 30, titulo);
+  LCD_Bitmap (62, 15, 195, 30, titulo);
   //LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
 
   //Ventana un jugador
-  Rect (10, 60, 140, 75, 0xFFFF);
-  LCD_Print ("Solo", 50, 40, 2, 0xFFFF, 0x0); 
-  LCD_Bitmap (70, 90, 15, 15, nave1);
+  Rect (10, 70, 140, 65, 0xFFFF);
+  LCD_Print ("Solo", 50, 62, 2, 0xFFFF, 0x0); 
+  LCD_Bitmap (70, 100, 15, 15, nave1);
+  
   //ventana dos jugadores
-  Rect (170, 60, 140, 75, 0xFFFF);
-  LCD_Print ("Duos", 210, 40, 2, 0xFFFF, 0x0);
-  LCD_Bitmap (215, 90, 15, 15, nave1);
-  LCD_Bitmap (245, 90, 15, 15, nave2);
+  Rect (170, 70, 140, 65, 0xFFFF);
+  LCD_Print ("Duos", 210, 62, 2, 0xFFFF, 0x0);
+  LCD_Bitmap (215, 100, 15, 15, nave1);
+  LCD_Bitmap (245, 100, 15, 15, nave2);
 }
 
 
