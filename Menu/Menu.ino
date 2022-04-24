@@ -44,6 +44,7 @@
 //***************************************************************************************************************************************
 //------------------- Estado del juego ----------------------
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
+char start = 0;
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -99,13 +100,6 @@ struct Menu {
   short height;
 };
 
-
-
-
-
-
-//-------------------- colisiones ---------------------------------
-
 #define LCD_RST PD_0
 #define LCD_CS PD_1
 #define LCD_RS PD_2
@@ -130,6 +124,8 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 //void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
 void Menu(void);
+void SetupSolo (void);
+void SetupDuos (void);
 
 extern uint8_t fondo[];
 
@@ -160,33 +156,7 @@ void setup() {
   
 
 
-  // ********** Ventanas para los elementos del juego ********** 
-//  FillRect(0, 190, 160, 239, 0x0); //vidas J1
-//  FillRect(160, 190, 319, 239, 0x0); //vidas J2
-//  FillRect(0, 0, 319, 190, 0x0); //juego
-  
-  //crear ventanas de menu
 
- // ********** text **********
-//
-// LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
-// LCD_Print("Jugador 1", 5, 195, 1, 0xFFFF, 0x0000);
-// LCD_Print("Jugador 2", 245, 195, 1, 0xFFFF, 0x0000);
-//
-// // ********** vidas J1 **********
-// //LCD_Print("Vidas: x3", 5, 210, 1, 0xFFFF, 0x0000);
-// LCD_Bitmap(5,210,15,15,nave1);
-// LCD_Bitmap(22,210,15,15,nave1);
-// LCD_Bitmap(39,210,15,15,nave1);
-// // ********** vidas J2 **********
-// //LCD_Print("Vidas: x3", 245, 210, 1, 0xFFFF, 0x0000);
-// LCD_Bitmap(265,210,15,15,nave2);
-// LCD_Bitmap(282,210,15,15,nave2);
-// LCD_Bitmap(299,210,15,15,nave2);
-//
-// // ********** division **********
-// H_line(0, 191, 319, 0xFFFF);
- //V_line(160, 0, 239, 0xFFFF);
 }
 
 
@@ -241,15 +211,39 @@ void loop() {
       }
       //hitbox menu
 
-      if (bulletP1.posY = 135){
-        if (bulletP1.posX <= 147 || bulletP1.posX >= 10){
-          //bulletP1.hit 
+      if (bulletP1.posY == 135){
+        if (bulletP1.posX <= 150 - bulletP1.largo && bulletP1.posX >= 10){
+          estado_juego = 1;
+          bulletP1.hit = 1;
+          start = 1;
+        }
+
+        if (bulletP1.posX <= 310 - bulletP1.largo && bulletP1.posX >= 170){
+          estado_juego = 2;
+          bulletP1.hit = 1;
+          start = 1;
         }
       }
-      
-
       break;
 
+      case 1:
+        if (start){
+          SetupSolo ();
+          start = 0;
+        }
+
+        
+      break;
+
+      case 2:
+        if (start){
+          SetupSolo (); //cambiar a duos despues
+          start = 0;
+        }
+
+
+
+      
     default: //pantalla de incio
       //nave para seleccionar jugadores
       //escribir que el cartucho esta corrupto
@@ -259,7 +253,7 @@ void loop() {
   }
 }
 //***************************************************************************************************************************************
-// Función para menu de incio
+// Función para menus
 //***************************************************************************************************************************************
 void Menu (){
   //320x240
@@ -279,7 +273,33 @@ void Menu (){
   LCD_Bitmap (245, 100, 15, 15, nave2);
 }
 
+void SetupSolo () {
+  //lineas
+  LCD_Clear(0x0);
+  H_line(0, 191, 319, 0xFFFF);
 
+  
+ // ********** text **********
+//
+// LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+// LCD_Print("Jugador 1", 5, 195, 1, 0xFFFF, 0x0000);
+// LCD_Print("Jugador 2", 245, 195, 1, 0xFFFF, 0x0000);
+//
+// // ********** vidas J1 **********
+// //LCD_Print("Vidas: x3", 5, 210, 1, 0xFFFF, 0x0000);
+// LCD_Bitmap(5,210,15,15,nave1);
+// LCD_Bitmap(22,210,15,15,nave1);
+// LCD_Bitmap(39,210,15,15,nave1);
+// // ********** vidas J2 **********
+// //LCD_Print("Vidas: x3", 245, 210, 1, 0xFFFF, 0x0000);
+// LCD_Bitmap(265,210,15,15,nave2);
+// LCD_Bitmap(282,210,15,15,nave2);
+// LCD_Bitmap(299,210,15,15,nave2);
+//
+// // ********** division **********
+// H_line(0, 191, 319, 0xFFFF);
+ //V_line(160, 0, 239, 0xFFFF);
+}
 
 
 
