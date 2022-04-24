@@ -17,6 +17,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <TM4C123GH6PM.h>
+
+
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
@@ -31,6 +33,7 @@
 #include "bitmaps.h"
 #include "font.h"
 #include "lcd_registers.h"
+
 
 #define SW1 PF_4
 #define SW2 PF_0
