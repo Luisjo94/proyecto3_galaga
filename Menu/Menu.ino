@@ -150,12 +150,12 @@ void loop() {
 
 // ------------------------------ nave 1 ------------------------------
   //moverse derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0)
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P1.ejeX < 303)
   {
     P1.ejeX++;  //ir a la derecha
   }
   //moverse izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1)
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P1.ejeX > 0)
   {
     P1.ejeX--;  //ir a la izquierda
   }
@@ -177,11 +177,14 @@ void loop() {
     H_line(P1.ejeX, P1.ejeY+15, 15, 0x0);
 
 // ------------------------------ nave 2 ------------------------------
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0)
+  //derecha
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P2.ejeX < 303)
   {
     P2.ejeX++;
   }
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1)
+
+  //izquierda
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P2.ejeX > 0)
   {
     P2.ejeX--;
   }
