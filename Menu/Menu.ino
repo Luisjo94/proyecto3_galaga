@@ -61,7 +61,7 @@ struct ship {
   const char  ancho;
 };
 //Posicion inicial de naves jugadores
-struct ship P1 = {0, 170, 15, 15};
+struct ship P1 = {155, 170, 15, 15};
 struct ship P2 = {303, 170, 15, 15};
 
 //Posicion enemigo
@@ -132,8 +132,8 @@ void Menu(void);
 void SetupSolo (void);
 void SetupDuos (void);
 
-void mover_nave_jugador (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX);
-
+void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX);
+void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY);
 
 
 //***************************************************************************************************************************************
@@ -169,10 +169,13 @@ void loop() {
   
   switch (estado_juego) { 
     case 0: //pantalla de inicio
-    
-    //mover_nave_jugador (nombre del bitmap, ancho, alto, *posicionX, posicionY, minimoX, maximoX)
-      mover_nave_jugador (nave1, 15, 15, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
+      //mover la nave en el ejeX
+      mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
 
+
+
+      //void disparo (unsigned char tipo [], char vuela, char golpeo, 
+      
       //la bala esta activa y no a golpeado nada
       if (bulletP1.active && !bulletP1.hit){
         //se salio de la pantalla
@@ -191,15 +194,16 @@ void loop() {
         }
       }
       
-      //disparar 
+      //disparar       
       if (digitalRead(SW1)==0 && digitalRead(SW2)==0 && bulletP1.active == 0){// condicion de disparo 
         bulletP1.posX = P1.ejeX+6;
         bulletP1.posY = P1.ejeY-8;
         bulletP1.active = 1;
         bulletP1.hit = 0;
       }
-      //hitbox menu
 
+      
+      //hitbox menu
       if (bulletP1.posY <= 135){
         if (bulletP1.posX <= 150 - bulletP1.largo && bulletP1.posX >= 7){
           estado_juego = 1;
@@ -226,6 +230,7 @@ void loop() {
           start = 0;
         }
 
+        mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
         
 
         
@@ -276,9 +281,15 @@ void SetupSolo () {
 
   LCD_Bitmap(5,210,15,15,nave1);
   LCD_Bitmap(22,210,15,15,nave1);
-  LCD_Bitmap(39,210,15,15,nave1);
+
 
   LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+
+
+  P1.ejeX = 155;
+  P1.ejeY = 170;
+  LCD_Bitmap (P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+  currentMillis = 0;
 }
 
 void SetupDuos (){
@@ -298,21 +309,39 @@ void SetupDuos (){
 
 
 //atento a habilitar la condicional de movimiento
-void mover_nave_jugador (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX){
+void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX){
   //mover a la derecha
   if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionX < maxiX){
     (*posicionX)++;
     LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
     V_line((*posicionX) - 1, posicionY, ancho ,0x0);
-    V_line((*posicionX) + 16, posicionY, ancho ,0x0);
+    V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
   }
 
   //mover izquierda
   if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionX > miniX){
     (*posicionX)--;
     LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-    V_line(*posicionX - 1, posicionY, ancho ,0x0);
-    V_line(*posicionX + 16, posicionY, ancho ,0x0);
+    V_line((*posicionX) - 1, posicionY, ancho ,0x0);
+    V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
+  }
+}
+
+void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY){
+  //mover a la derecha
+  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionY < maxiY){
+    (*posicionY)++;
+    LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
+    H_line(posicionX, (*posicionY) - 1, alto, 0x0);
+    H_line(posicionX, (*posicionY) + 1 + alto, alto, 0x0);
+  }
+
+  //mover izquierda
+  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionY > miniY){
+    (*posicionY)--;
+    LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
+    H_line(posicionX, (*posicionY) - 1, alto, 0x0);
+    H_line(posicionX, (*posicionY) + 1 + alto, alto, 0x0);
   }
 }
 
