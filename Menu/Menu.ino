@@ -97,8 +97,12 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
 //void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
+void Menu(void);
 
 extern uint8_t fondo[];
+
+
+
 //***************************************************************************************************************************************
 // Inicialización
 //***************************************************************************************************************************************
@@ -109,40 +113,44 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x00);
-
+  Menu();
 
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
 
-
-  // ********** Ventanas para los elementos del juego ********** 
-  FillRect(0, 190, 160, 239, 0x0); //vidas J1
-  FillRect(160, 190, 319, 239, 0x0); //vidas J2
-  FillRect(0, 0, 319, 190, 0x0); //juego
   
 
 
+  // ********** Ventanas para los elementos del juego ********** 
+//  FillRect(0, 190, 160, 239, 0x0); //vidas J1
+//  FillRect(160, 190, 319, 239, 0x0); //vidas J2
+//  FillRect(0, 0, 319, 190, 0x0); //juego
+  
+  //crear ventanas de menu
+
  // ********** text **********
- //LCD_Print("Nivel 1", 5, 5, 2, 0xFFFF, 0x0000);
- LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
- LCD_Print("Jugador 1", 5, 195, 1, 0xFFFF, 0x0000);
- LCD_Print("Jugador 2", 245, 195, 1, 0xFFFF, 0x0000);
-
- // ********** vidas J1 **********
- //LCD_Print("Vidas: x3", 5, 210, 1, 0xFFFF, 0x0000);
- LCD_Bitmap(5,210,15,15,nave1);
- LCD_Bitmap(22,210,15,15,nave1);
- LCD_Bitmap(39,210,15,15,nave1);
- // ********** vidas J2 **********
- //LCD_Print("Vidas: x3", 245, 210, 1, 0xFFFF, 0x0000);
- LCD_Bitmap(265,210,15,15,nave2);
- LCD_Bitmap(282,210,15,15,nave2);
- LCD_Bitmap(299,210,15,15,nave2);
-
- // ********** division **********
- H_line(0, 191, 319, 0xFFFF);
+//
+// LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+// LCD_Print("Jugador 1", 5, 195, 1, 0xFFFF, 0x0000);
+// LCD_Print("Jugador 2", 245, 195, 1, 0xFFFF, 0x0000);
+//
+// // ********** vidas J1 **********
+// //LCD_Print("Vidas: x3", 5, 210, 1, 0xFFFF, 0x0000);
+// LCD_Bitmap(5,210,15,15,nave1);
+// LCD_Bitmap(22,210,15,15,nave1);
+// LCD_Bitmap(39,210,15,15,nave1);
+// // ********** vidas J2 **********
+// //LCD_Print("Vidas: x3", 245, 210, 1, 0xFFFF, 0x0000);
+// LCD_Bitmap(265,210,15,15,nave2);
+// LCD_Bitmap(282,210,15,15,nave2);
+// LCD_Bitmap(299,210,15,15,nave2);
+//
+// // ********** division **********
+// H_line(0, 191, 319, 0xFFFF);
  //V_line(160, 0, 239, 0xFFFF);
 }
+
+
 //***************************************************************************************************************************************
 // Loop Infinito
 //***************************************************************************************************************************************
@@ -178,61 +186,66 @@ void loop() {
 
 // ------------------------------ nave 2 ------------------------------
   //derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P2.ejeX < 303)
-  {
-    P2.ejeX++;
-  }
-
-  //izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P2.ejeX > 0)
-  {
-    P2.ejeX--;
-  }
-  //disparar 
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==0)
-  {
-    bulletP2.posX = P2.ejeX+6;
-    for (bulletP2.posY=P2.ejeY-8; bulletP2.posY>-8; bulletP2.posY--)
-    {
-      delay(1);
-      LCD_Bitmap(bulletP2.posX, bulletP2.posY, 3, 8, bullet);
-    }
-  }
-    LCD_Bitmap(P2.ejeX,P2.ejeY,15,15,nave2);
-    V_line( P2.ejeX-1, P2.ejeY, 15, 0x0);
-    V_line( P2.ejeX+16, P2.ejeY, 15, 0x0);
-    H_line(P2.ejeX, P2.ejeY-1, 15, 0x0);
-    H_line(P2.ejeX, P2.ejeY+15, 15, 0x0);
-
-// ------------------------------ enemigo 1 ------------------------------
-//  tiempo = milis();
-//
-//  if (tiempo == 1000)
+//  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && P2.ejeX < 303)
 //  {
-//    for (int x=0; x<319; x++ )
+//    P2.ejeX++;
+//  }
+//
+//  //izquierda
+//  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && P2.ejeX > 0)
+//  {
+//    P2.ejeX--;
+//  }
+//  //disparar 
+//  if (digitalRead(SW1)==0 && digitalRead(SW2)==0)
+//  {
+//    bulletP2.posX = P2.ejeX+6;
+//    for (bulletP2.posY=P2.ejeY-8; bulletP2.posY>-8; bulletP2.posY--)
 //    {
-//      
+//      delay(1);
+//      LCD_Bitmap(bulletP2.posX, bulletP2.posY, 3, 8, bullet);
 //    }
 //  }
+//    LCD_Bitmap(P2.ejeX,P2.ejeY,15,15,nave2);
+//    V_line( P2.ejeX-1, P2.ejeY, 15, 0x0);
+//    V_line( P2.ejeX+16, P2.ejeY, 15, 0x0);
+//    H_line(P2.ejeX, P2.ejeY-1, 15, 0x0);
+//    H_line(P2.ejeX, P2.ejeY+15, 15, 0x0);
 
-    if (colision == 0)
-    {
-      if ((bad1.ejeX <= bulletP1.posX && bad1.ejeX+15 >= bulletP1.posX) || (bad1.ejeX <= bulletP2.posX && bad1.ejeX+15 >= bulletP2.posX))
-      {
-      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0x0);
-      colision = 1;
-      }
-      else 
-      {
-      colision = 0;
-      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0xFFFF);
-      }
-    }
-    
-    
-
-
+// ------------------------------ enemigo 1 ------------------------------
+//
+//    if (colision == 0)
+//    {
+//      if ((bad1.ejeX <= bulletP1.posX && bad1.ejeX+15 >= bulletP1.posX) || (bad1.ejeX <= bulletP2.posX && bad1.ejeX+15 >= bulletP2.posX))
+//      {
+//      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0x0);
+//      colision = 1;
+//      }
+//      else 
+//      {
+//      colision = 0;
+//      FillRect(bad1.ejeX, bad1.ejeY, 15, 15, 0xFFFF);
+//      }
+//    }    
 }
+
+//***************************************************************************************************************************************
+// Función para menu de incio
+//***************************************************************************************************************************************
+void Menu (){
+  //320x240
+  //Ventana un jugador
+  Rect (10, 10, 140, 125, 0xFFFF);
+  LCD_Print ("Solo", 50, 40, 2, 0xFFFF, 0x0); 
+  LCD_Bitmap (70, 70, 15, 15, nave1);
+  //ventana dos jugadores
+  Rect (170, 10, 140, 125, 0xFFFF);
+  LCD_Print ("Duos", 210, 40, 2, 0xFFFF, 0x0);
+  LCD_Bitmap (200, 70, 15, 15, nave1);
+  LCD_Bitmap (225, 70, 15, 15, nave2);
+}
+
+
 //***************************************************************************************************************************************
 // Función para inicializar LCD
 //***************************************************************************************************************************************
@@ -426,6 +439,8 @@ void V_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c) {
   }
   digitalWrite(LCD_CS, HIGH);
 }
+
+
 //***************************************************************************************************************************************
 // Función para dibujar un rectángulo - parámetros ( coordenada x, cordenada y, ancho, alto, color)
 //***************************************************************************************************************************************
@@ -438,14 +453,6 @@ void Rect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsign
 //***************************************************************************************************************************************
 // Función para dibujar un rectángulo relleno - parámetros ( coordenada x, cordenada y, ancho, alto, color)
 //***************************************************************************************************************************************
-/*void FillRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int c) {
-  unsigned int i;
-  for (i = 0; i < h; i++) {
-    H_line(x  , y  , w, c);
-    H_line(x  , y+i, w, c);
-  }
-  }
-*/
 
 void FillRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int c) {
   LCD_CMD(0x02c); // write_memory_start
@@ -548,38 +555,3 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 //***************************************************************************************************************************************
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
 //***************************************************************************************************************************************
-//void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset) {
-//  LCD_CMD(0x02c); // write_memory_start
-//  digitalWrite(LCD_RS, HIGH);
-//  digitalWrite(LCD_CS, LOW);
-//
-//  unsigned int x2, y2;
-//  x2 =   x + width;
-//  y2 =    y + height;
-//  SetWindows(x, y, x2 - 1, y2 - 1);
-//  int k = 0;
-//  int ancho = ((width * columns));
-////  if (flip) {
-////    for (int j = 0; j < height; j++) {
-////      k = (j * (ancho) + index * width - 1 - offset) * 2;
-////      k = k + width * 2;
-////      for (int i = 0; i < width; i++) {
-////        LCD_DATA(bitmap[k]);
-////        LCD_DATA(bitmap[k + 1]);
-////        k = k - 2;
-////      }
-////    }
-////  } else {
-////    for (int j = 0; j < height; j++) {
-////      k = (j * (ancho) + index * width + 1 + offset) * 2;
-////      for (int i = 0; i < width; i++) {
-////        LCD_DATA(bitmap[k]);
-////        LCD_DATA(bitmap[k + 1]);
-////        k = k + 2;
-////      }
-////    }
-//
-//
-//  }
-//  digitalWrite(LCD_CS, HIGH);
-//}
