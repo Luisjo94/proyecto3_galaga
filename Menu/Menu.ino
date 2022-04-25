@@ -1,3 +1,4 @@
+
 //***************************************************************************************************************************************
 /* Librería para el uso de la pantalla ILI9341 en modo 8 bits
    Basado en el código de martinayotte - https://www.stm32duino.com/viewtopic.php?t=637
@@ -172,6 +173,8 @@ void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho
 
 //void hitbox ();
 
+void boom (unsigned char tipo [], short ejeX, short ejeY);
+
 //-------------------- tiempo -------------------------------------
 unsigned long currentMillis;
 
@@ -258,12 +261,15 @@ void loop() {
           bulletP1.hit = 1;
           bulletP1.active = 0;
           bad1.flag = 1;
+
+          boom (explosion_bad, bad1.ejeX, bad1.ejeY);
+          
           for (char i = 0; i < 5; i++)
           {
             LCD_Sprite(bad1.ejeX-12, bad1.ejeY-10, 32, 32, explosion_bad, 5, i, 0, 0);
             delay(20);
           }
-          //bad1.ejeX = -15;
+          bad1.ejeX = -15;
           
         }
       }
@@ -627,8 +633,12 @@ void duos_setup () {
   generar_disparo (&bulletP2.ejeX, &bulletP2.ejeY, P2.ejeX, P2.ejeY, &bulletP2.active, &bulletP2.hit);
 }
 
-
-
+void boom (unsigned char tipo [], short ejeX, short ejeY){
+  for (char i = 0; i < 5; i++){
+    LCD_Sprite(ejeX-12, ejeY-10, 32, 32, tipo, 5, i, 0, 0);
+    delay(20);
+  }
+}
 
 
 
