@@ -38,6 +38,13 @@
 #define SW1 PF_4
 #define SW2 PF_0
 
+#define UP 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+
+
+
 
 //***************************************************************************************************************************************
 // Variables
@@ -64,6 +71,7 @@ struct ship {
   char vidas;
   unsigned short score;
 };
+//a mayor intervalo mas lento es la animacion
 //Posicion inicial de naves jugadores
 struct ship P1 = {155, 170, 15, 15, 0, 5};
 struct ship P2 = {303, 170, 15, 15, 0, 2};
@@ -144,8 +152,7 @@ void P1_setup (void);
 
 void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval);
 
-void mover_NPC_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMilis, unsigned long interval, char direccion);
-void mover_NPC_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY, unsigned long *PrevMilis, unsigned long interval, char direccion);
+void move_NPC (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag);
 
 void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit);
 void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo);
@@ -325,43 +332,70 @@ void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char 
 }
 
 
-void mover_NPC_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMilis, unsigned long interval, char direccion){
-  //mover hacia derecha
-  if (!direccion && (*posicionX) < maxiX) {
-    (*posicionX)++;
-    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-    H_line((*posicionX) - 1, posicionY, alto, 0x0);
-    H_line((*posicionX) + 1 + ancho, posicionY, alto, 0x0);
-  }
+//#define UP 0
+//#define DOWN 1
+//#define LEFT 2
+//#define RIGHT 3
 
-  //mover hacia arriba
-  if (direccion && (*posicionX) > miniX) {
-    (*posicionX)--;
-    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-    H_line((*posicionX) - 1, posicionY, alto, 0x0);
-    H_line((*posicionX) +1 + ancho, posicionY, alto, 0x0);
+//pos_cons = ejeY, pos_change = ejeX,,,,, &P1.ejeX... flag = bandera
+void move_NPC (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag){
+  if (currentMillis - *PrevMillis >= interval){
+    switch (direccion){
+      case UP:
+        if ((*pos_change) > mini && !(*flag)){
+          (*pos_change)--;
+          LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
+          H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
+          H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+  
+      case DOWN:
+        if ((*pos_change) < maxi && !(*flag)) {
+          (*pos_change)--;
+          LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
+          H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
+          H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+
+      case LEFT:
+        if ((*pos_change) > mini && !(*flag)) {
+          (*pos_change)--;
+          LCD_Bitmap(*pos_change, pos_cons, ancho, alto, tipo);
+          H_line((*pos_change) - 1, pos_cons, alto, 0x0);
+          H_line((*pos_change) +1 + ancho, pos_cons, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+        
+      case RIGHT:
+        if ((*pos_change) < maxi && !(*flag)) {
+          (*pos_change)++;
+          LCD_Bitmap(*pos_change, pos_cons, ancho, alto, tipo);
+          H_line((*pos_change) - 1, pos_cons, alto, 0x0);
+          H_line((*pos_change) + 1 + ancho, pos_cons, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+
+      default:
+        *flag = 2;
+        break;
+    }
+    *PrevMillis = currentMillis;
   }
 }
-
-//es mas que todo para NPC, se mueven en base al tiempo
-void mover_NPC_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY, unsigned long *PrevMilis, unsigned long interval, char direccion){
-  //mover hacia abajo
-  if (!direccion && (*posicionY) < maxiY) {
-    (*posicionY)++;
-    LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
-    H_line(posicionX, (*posicionY) - 1, alto, 0x0);
-    H_line(posicionX, (*posicionY) + 1 + alto, alto, 0x0);
-  }
-
-  //mover hacia arriba
-  if (direccion && (*posicionY) > miniY) {
-    (*posicionY)--;
-    LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
-    H_line(posicionX, (*posicionY) - 1, alto, 0x0);
-    H_line(posicionX, (*posicionY) + 1 + alto, alto, 0x0);
-  }
-}
-
 
 //permite controlar un objeto que este volando a traves de la pantalla, un disparo de las naves
 void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho, char alto, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo){
