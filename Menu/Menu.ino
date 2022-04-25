@@ -76,8 +76,18 @@ struct ship {
 struct ship P1 = {155, 170, 15, 15, 0, 5};
 struct ship P2 = {303, 170, 15, 15, 0, 2};
 
+struct enemy {
+  short ejeX;
+  short ejeY;
+  const char  alto;
+  const char  ancho;
+  unsigned long previo;
+  unsigned long intervalo;
+  char flag;
+  char active;
+};
 //Posicion enemigo
-struct ship bad1 = {100, 100};
+struct enemy bad1 = {100, 100};
 
 //------------------- disparos ---------------------------
 struct object {
@@ -337,17 +347,21 @@ void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char 
 //#define LEFT 2
 //#define RIGHT 3
 
-//pos_cons = ejeY, pos_change = ejeX,,,,, &P1.ejeX... flag = bandera
+//pude mover un PNC a cualquier direccion
 void move_NPC (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag){
+  //chequea los millis para ell moviemiento, la velociad
   if (currentMillis - *PrevMillis >= interval){
+    //permite elegir la dirccion a la que se movera el enmigo
     switch (direccion){
       case UP:
+        //revisa que no haya llegado al limite y la bandera este apagada
         if ((*pos_change) > mini && !(*flag)){
           (*pos_change)--;
           LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
           H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
           H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
         }
+        // en el caso de llegar al limite se enciende la bandera
         else {
           *flag = 1;
         }
@@ -389,6 +403,7 @@ void move_NPC (unsigned char tipo [], unsigned char ancho, unsigned char alto,  
         }
         break;
 
+      //en el pero de los casos la bandera se pone en 2
       default:
         *flag = 2;
         break;
