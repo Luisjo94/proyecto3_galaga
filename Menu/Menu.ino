@@ -44,7 +44,7 @@
 //***************************************************************************************************************************************
 //------------------- Estado del juego ----------------------
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
-char start = 0;
+char start = 1; //bandera para cargar el menu
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -61,6 +61,8 @@ struct ship {
   const char  ancho;
   unsigned long previo;
   unsigned long intervalo;
+  char vidas;
+  unsigned short score;
 };
 //Posicion inicial de naves jugadores
 struct ship P1 = {155, 170, 15, 15, 0, 5};
@@ -134,7 +136,7 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 extern uint8_t fondo[];
 
 //-------------------- prototipo de funciones --------------------------------------------
-void Menu(void);
+void SetupMenu (void);
 void SetupSolo (void);
 void SetupDuos (void);
 
@@ -160,14 +162,10 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x00);
-  Menu();
 
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
-  
-  //Menu inicial
-  player = {0, 303, 145, 170};
-  LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+
 
 }
 
@@ -180,10 +178,10 @@ void loop() {
   
   switch (estado_juego) { 
     case 0: //pantalla de inicio
-      
-
-
-      
+      if (start){
+        SetupMenu();
+        start = 0;
+      }
       P1_setup ();
       
       //hitbox menu
@@ -209,9 +207,7 @@ void loop() {
           start = 0;
         }
         P1_setup ();
-        
 
-        
       break;
 
       case 2:
@@ -220,9 +216,6 @@ void loop() {
           start = 0;
         }
 
-
-
-      
     default: //pantalla de incio
       //nave para seleccionar jugadores
       //escribir que el cartucho esta corrupto
@@ -234,11 +227,23 @@ void loop() {
 //***************************************************************************************************************************************
 // Función para menus
 //***************************************************************************************************************************************
-void Menu (){
-  //320x240
-  //titulo del juego
+void SetupMenu (){
+  //limpiar pantalla
+  LCD_Clear(0x00);
+
+  //limites de las naves
+  player = {0, 304, 0, 224};
+
+  //spawnear la nave 1
+  LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+  
+  //reiniciar los scores
+  P1.score = 0;
+  P2.score = 0; 
+
   LCD_Bitmap (62, 15, 195, 30, titulo);
-  //LCD_Print ("GALAGA", 112, 15, 2, 0xFFFF, 0x0);
+  LCD_Print ("Shoot to select a game mode", 40, 210, 1, 0xFFFF, 0x0);
+
 
   //Ventana un jugador
   Rect (7, 70, 143, 65, 0xFFFF);
