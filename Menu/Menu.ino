@@ -59,20 +59,22 @@ struct ship {
   short ejeY;
   const char  alto;
   const char  ancho;
+  unsigned long previo;
+  unsigned long intervalo;
 };
 //Posicion inicial de naves jugadores
-struct ship P1 = {155, 170, 15, 15};
-struct ship P2 = {303, 170, 15, 15};
+struct ship P1 = {155, 170, 15, 15, 0, 5};
+struct ship P2 = {303, 170, 15, 15, 0, 2};
 
 //Posicion enemigo
 struct ship bad1 = {100, 100};
 
 //------------------- disparos ---------------------------
 struct object {
-  short posX;
-  short posY;
-  char  largo;
+  short ejeX;
+  short ejeY;
   char  alto;
+  char  ancho;
   char  active;
   char  hit;
   unsigned long previo;
@@ -80,7 +82,7 @@ struct object {
 };
                                                
 //balas de ambos jugadores
-struct object bulletP1 = {0,0, 3, 8, 0, 0, 0, 2};
+struct object bulletP1 = {0,0, 8, 3, 0, 0, 0, 2};
 struct object bulletP2 = bulletP1;
 
 
@@ -136,8 +138,13 @@ void Menu(void);
 void SetupSolo (void);
 void SetupDuos (void);
 
-void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX);
+void P1_setup (void);
+
+void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval);
 void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY);
+
+void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit);
+void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho, char largo, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo);
 
 //-------------------- tiempo -------------------------------------
 unsigned long currentMillis;
@@ -161,11 +168,7 @@ void setup() {
   //Menu inicial
   player = {0, 303, 145, 170};
   LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-  
-  //bulletP1.intervalo = 1;
-  //bulletP2.intervalo = 1;
-  //bulletP1.largo = 3;
-  //bulletP1.alto = 8;
+
 }
 
 
@@ -173,65 +176,31 @@ void setup() {
 // Loop Infinito
 //***************************************************************************************************************************************
 void loop() {
-  
+  currentMillis = millis();
   
   switch (estado_juego) { 
     case 0: //pantalla de inicio
-      //mover la nave en el ejeX
-      mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
-
-
-      //se supone que ambos tipos de bala son iguales, largo y alto no cambian y posX es constante, posY cambia, tiempo previo, intervalo 
-      //void disparo (unsigned char tipo [], char *active, char *hit, char largo, char alto, short posicionX, short *posicionY, char  
       
-      //la bala esta activa y no a golpeado nada
-      if (bulletP1.active && !bulletP1.hit){
-        currentMillis = millis();
-        
-        //se salio de la pantalla
-        if (bulletP1.posY < -8){
-          FillRect (bulletP1.posX, bulletP1.posY, bulletP1.largo, bulletP1.alto, 0x0000);
-          bulletP1.active = 0;
-          bulletP1.hit = 0;
-        }
-        //esta dentro de la pantalla pero no ha golpeado nada
-        else {
-          if (currentMillis - bulletP1.previo >= bulletP1.intervalo){
-            bulletP1.previo = currentMillis;
-            bulletP1.posY--;
-            LCD_Bitmap(bulletP1.posX, bulletP1.posY, bulletP1.largo, bulletP1.alto, bullet);  
-          }
-        }
-      }
-      
-      //disparar       
-      if (digitalRead(SW1)==0 && digitalRead(SW2)==0 && bulletP1.active == 0){// condicion de disparo 
-        bulletP1.posX = P1.ejeX+6;
-        bulletP1.posY = P1.ejeY-8;
-        bulletP1.active = 1;
-        bulletP1.hit = 0;
-      }
 
+
+      
+      P1_setup ();
       
       //hitbox menu
-      if (bulletP1.posY <= 135){
-        if (bulletP1.posX <= 150 - bulletP1.largo && bulletP1.posX >= 7){
+      if (bulletP1.ejeY <= 135){
+        if (bulletP1.ejeX <= 150 - bulletP1.ancho && bulletP1.ejeX >= 7){
           estado_juego = 1;
           bulletP1.hit = 1;
+          bulletP1.active = 0;
           start = 1;
         }
 
-        if (bulletP1.posX <= 315 - bulletP1.largo && bulletP1.posX >= 169){
+        if (bulletP1.ejeX <= 315 - bulletP1.ancho && bulletP1.ejeX >= 169){
           estado_juego = 2;
           bulletP1.hit = 1;
           start = 1;
         }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
       }
-
-//      if (bulletP1.posY <=45){
-//        //activar EE
-//        LCD_Bitmap (10, 10, 87, 100, malhit);
-//      }
       break;
 
       case 1:
@@ -239,8 +208,7 @@ void loop() {
           SetupSolo ();
           start = 0;
         }
-
-        mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax);
+        P1_setup ();
         
 
         
@@ -318,24 +286,36 @@ void SetupDuos (){
 
 
 //atento a habilitar la condicional de movimiento
-void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX){
-  //mover a la derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionX < maxiX){
-    (*posicionX)++;
-    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-    V_line((*posicionX) - 1, posicionY, ancho ,0x0);
-    V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
-  }
+//esta funcion permite mover algun objeto pre_existente a lo largo del eje X, se pued variar la velocidad a la que se mueve en vase a la funcion Millis
+void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval){
+  //revisa que hayan pasado los suficiente millis para moverse, es decir la velocidad a la que se puede mover
+  if (currentMillis - *PrevMillis >= interval){
 
-  //mover izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionX > miniX){
-    (*posicionX)--;
-    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-    V_line((*posicionX) - 1, posicionY, ancho ,0x0);
-    V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
+    //mover a la derecha
+    if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionX < maxiX){
+      //se incrementa la posicion del objeto en el eje X  
+      (*posicionX)++;
+
+      //cargar el bitmap nueva mente pero con el desplasamiento
+      LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+
+      //se utilizan para borrar las orillas del model, es decir que no se ve su trazo
+      V_line((*posicionX) - 1, posicionY, ancho ,0x0);
+      V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
+    }
+  
+    //mover izquierda, mismo proceso que a la derecha
+    if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionX > miniX){
+      (*posicionX)--;
+      LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+      V_line((*posicionX) - 1, posicionY, ancho ,0x0);
+      V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
+    }
+    *PrevMillis = currentMillis;
   }
 }
 
+//lo mismo que en el ejeX
 void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY){
   //mover a la derecha
   if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionY < maxiY){
@@ -353,6 +333,55 @@ void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char 
     H_line(posicionX, (*posicionY) + 1 + alto, alto, 0x0);
   }
 }
+
+
+//permite controlar un objeto que este volando a traves de la pantalla, un disparo de las naves
+void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho, char alto, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo){
+  //de primero ve si el disparo esta activo y no haya golpeado algo
+  if ((*active) && !(*hit)){
+    //si se sale de la pantalla reiniciar el estado del disparo
+    if (*posicionY < - (alto)){
+      *active = 0;
+      *hit = 0;
+    }
+
+    //el disparo esta dentro de la pantalla
+    else {
+      //controlar la velocidad del disparo
+      if (currentMillis - (*previo) >= intervalo){
+        //actualizar su valor para que siga funcionando piola
+        *previo = currentMillis;
+        //hace que l disparo suba una casilla
+        (*posicionY) --;
+        //actualizar su bitmap, en esta caso no es necesario ir borrando ya que tiene lineas negras arriva y abajo
+        LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
+      }
+    }
+  }
+}
+
+//estar atento a la condicion de disparo
+void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit){
+  if (!digitalRead(SW1) && !digitalRead(SW2) && !(*active)){
+    *posicionX = refX + 6;
+    *posicionY = refY - 8;
+    *active = 1;
+    *hit = 0;
+  }
+}
+
+
+//setup para la nave del jugador 1
+void P1_setup () {
+  mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax, &P1.previo, P1.intervalo);
+  disparo_volando (bullet, &bulletP1.active, &bulletP1.hit, bulletP1.ancho, bulletP1.alto, bulletP1.ejeX, &bulletP1.ejeY, &bulletP1.previo, bulletP1.intervalo); 
+  generar_disparo (&bulletP1.ejeX, &bulletP1.ejeY, P1.ejeX, P1.ejeY, &bulletP1.active, &bulletP1.hit);
+}
+
+
+
+
+
 
 
 
