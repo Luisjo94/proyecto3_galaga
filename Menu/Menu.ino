@@ -143,9 +143,13 @@ void SetupDuos (void);
 void P1_setup (void);
 
 void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval);
-void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY);
+
+void mover_NPC_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMilis, unsigned long interval, char direccion);
+void mover_NPC_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY, unsigned long *PrevMilis, unsigned long interval, char direccion);
 
 void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit);
+void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo);
+
 void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho, char largo, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo);
 
 //-------------------- tiempo -------------------------------------
@@ -320,18 +324,37 @@ void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char 
   }
 }
 
-//lo mismo que en el ejeX
-void mover_nave_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY){
-  //mover a la derecha
-  if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionY < maxiY){
+
+void mover_NPC_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMilis, unsigned long interval, char direccion){
+  //mover hacia derecha
+  if (!direccion && (*posicionX) < maxiX) {
+    (*posicionX)++;
+    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+    H_line((*posicionX) - 1, posicionY, alto, 0x0);
+    H_line((*posicionX) + 1 + ancho, posicionY, alto, 0x0);
+  }
+
+  //mover hacia arriba
+  if (direccion && (*posicionX) > miniX) {
+    (*posicionX)--;
+    LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+    H_line((*posicionX) - 1, posicionY, alto, 0x0);
+    H_line((*posicionX) +1 + ancho, posicionY, alto, 0x0);
+  }
+}
+
+//es mas que todo para NPC, se mueven en base al tiempo
+void mover_NPC_ejeY (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short posicionX, short *posicionY, short miniY, short maxiY, unsigned long *PrevMilis, unsigned long interval, char direccion){
+  //mover hacia abajo
+  if (!direccion && (*posicionY) < maxiY) {
     (*posicionY)++;
     LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
     H_line(posicionX, (*posicionY) - 1, alto, 0x0);
     H_line(posicionX, (*posicionY) + 1 + alto, alto, 0x0);
   }
 
-  //mover izquierda
-  if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionY > miniY){
+  //mover hacia arriba
+  if (direccion && (*posicionY) > miniY) {
     (*posicionY)--;
     LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
     H_line(posicionX, (*posicionY) - 1, alto, 0x0);
@@ -368,6 +391,16 @@ void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho
 //estar atento a la condicion de disparo
 void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit){
   if (!digitalRead(SW1) && !digitalRead(SW2) && !(*active)){
+    *posicionX = refX + 6;
+    *posicionY = refY - 8;
+    *active = 1;
+    *hit = 0;
+  }
+}
+
+void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo) {
+  if (currentMillis - (*previo) >= intervalo){
+    *previo = currentMillis;
     *posicionX = refX + 6;
     *posicionY = refY - 8;
     *active = 1;
