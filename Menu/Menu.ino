@@ -50,14 +50,15 @@
 //***************************************************************************************************************************************
 // Variables
 //***************************************************************************************************************************************
+//-------------------- definicion para todas las entidades --------------------------
 struct dimensions {
   char alto;
   char ancho;
 };
 
 struct posicion {
-  char ejeX;
-  char ejeY;
+  short ejeX;
+  short ejeY;
 };
 
 struct tiempo {
@@ -67,7 +68,7 @@ struct tiempo {
 };
 
 struct jugador {
-  char score;
+  unsigned short score;
   char vidas;
 };
 
@@ -77,12 +78,20 @@ struct misc {
   char flag;
 };
 
+struct bound {
+  short miniX;
+  short maxiX;
+  short miniY;
+  short maxiY;
+};
+
 struct entity {
   struct dimensions dimension;
   struct posicion   pos;
   struct tiempo     mils;
   struct jugador    player;
   struct misc       info;
+  struct bound      limites;
 };
 
 struct entity shipP1;
@@ -90,39 +99,10 @@ struct entity shipP2;
 
 struct entity shipNPC1;
 
-struct entity bulP1;
-struct entity bulP2;
+struct entity bulletP1;
+struct entity bulletP2;
 
-void Setup_P1 (void);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//------------------- limites
 //------------------- Estado del juego ----------------------
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 char start = 1; //bandera para cargar el menu
@@ -131,71 +111,6 @@ char start = 1; //bandera para cargar el menu
 // 3, endgame
 //  3.1 tiene highscore
 //  3.2 no tiene highscore
-
-
-
-////------------------- Posicion de naves ---------------------
-//struct ship {
-//  short ejeX;
-//  short ejeY;
-//  const char  alto;
-//  const char  ancho;
-//  unsigned long previo;
-//  unsigned long intervalo;
-//  char vidas;
-//  unsigned short score;
-//};
-////a mayor intervalo mas lento es la animacion
-////Posicion inicial de naves jugadores
-//struct ship P1 = {155, 170, 15, 15, 0, 5, 2, 0};
-//struct ship P2 = {303, 170, 15, 15, 0, 5, 2, 0};
-//
-//struct enemy {
-//  short ejeX;
-//  short ejeY;
-//  const char  alto;
-//  const char  ancho;
-//  unsigned long previo;
-//  unsigned long intervalo;
-//  char flag;
-//  char active;
-//};
-////Posicion enemigo
-//struct enemy bad1 = {0, 100, 15, 15, 0, 20};
-//
-////------------------- disparos ---------------------------
-//struct object {
-//  short ejeX;
-//  short ejeY;
-//  char  alto;
-//  char  ancho;
-//  char  active;
-//  char  hit;
-//  unsigned long previo;
-//  unsigned long intervalo;
-//};
-//                                               
-////balas de ambos jugadores
-//struct object bulletP1 = {0,0, 8, 3, 0, 0, 0, 2};
-//struct object bulletP2 = bulletP1;
-//
-//
-////------------------- limites ---------------------------
-//struct Bound {
-//  short xMin;
-//  short xMax;
-//  short yMin;
-//  short yMax;
-//};
-//struct Bound player = {0, 304, 0, 224};
-//struct Bound enemy = {0, 303, 0, 210};
-//
-//struct Menu {
-//  short startX;
-//  short startY;
-//  short width;
-//  short height;
-//};
 
 
 //------------------- tiempo --------------------------
@@ -229,34 +144,34 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 extern uint8_t fondo[];
 
 //-------------------- prototipo de funciones --------------------------------------------
+//pantalla inicial y condiciones iniciales
 void SetupMenu (void);
 void SetupSolo (void);
 void SetupDuos (void);
-//nuevas funciones
 
-void move_player (unsigned char tipo [], struct entity *sel, short mini, short maxi);
+//spawnear naves
+void spawn_ship (unsigned char tipo [], struct entity *sel);
+
+//mover naves
+void move_player (unsigned char tipo [], struct entity *sel);
 void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion);
+
+//disparo desde nave
 void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *sel);
 void shoot_NPC (unsigned char tipo[], struct entity sel_ref, struct entity *sel);
-void disparo_volando2 (unsigned char tipo [], struct entity *sel);
+void disparo_volando (unsigned char tipo [], struct entity *sel);
 
+//vidas y hitboxes
+void vidasJI (struct entity *sel);
+void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship);
+void boom (unsigned char tipo[], struct entity sel);
+
+//setup de las naves
 void setup_P1 (void);
 //viejas funciones
 
 
 
-//void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval);
-//
-//void move_NPC (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag);
-//
-//void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit);
-//void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo);
-//
-//void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho, char largo, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo);
-
-//void hitbox ();
-
-void boom (unsigned char tipo [], short ejeX, short ejeY);
 
 //-------------------- tiempo -------------------------------------
 unsigned long currentMillis;
@@ -273,27 +188,10 @@ void setup() {
   LCD_Init();
   LCD_Clear(0x00);
 
+  start = 1;
+  
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
-
-
-  shipP1.dimension = {15, 15};
-  shipP1.pos = {155, 170};
-  shipP1.mils = {0, 5};
-  shipP1.player = {0, 2};
-
-  shipP2 = shipP1;
-
-  shipNPC1.dimension = {15, 15};
-  shipNPC1.pos = {0, 100};
-  shipNPC1.mils = {0,20};
-  shipNPC1.info = {0,0,0};
-
-  bulP1.dimension = {8, 3};
-  bulP1.mils = {0, 2};
-  bulP1.info = {0,0,0};
-//  
-//  bulletP2 = bulletP1;
 
 
 
@@ -315,32 +213,33 @@ void loop() {
         start = 0;
       }
       setup_P1 ();
-      //P1_setup ();
-      
-      //hitbox menu
-      if (bulP1.pos.ejeY <= 135){
-        if (bulP1.pos.ejeX <= 150 - bulP1.dimension.ancho && bulP1.pos.ejeX >= 7){
+
+      if (bulletP1.pos.ejeY <= 135){
+        if (bulletP1.pos.ejeX <= 150 - bulletP1.dimension.ancho && bulletP1.pos.ejeX >= 7){
           estado_juego = 1;
-          bulP1.info.hit = 1;
-          bulP1.info.active = 0;
+          bulletP1.info.hit = 1;
+          bulletP1.info.active = 0;
           start = 1;
         }
 
-        if (bulP1.pos.ejeX <= 315 - bulP1.dimension.ancho && bulP1.pos.ejeX >= 169){
+        if (bulletP1.pos.ejeX <= 315 - bulletP1.dimension.ancho && bulletP1.pos.ejeX >= 169){
           estado_juego = 2;
-          bulP1.info.hit = 1;
+          bulletP1.info.hit = 1;
+          bulletP1.info.active = 0;
           start = 1;
         }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
       }
       break;
 
       // ****************************** SOLO MODE ******************************
-//      case 1:
-//      // ---------- map setup ----------
-//        if (start){
-//          SetupSolo ();
-//          start = 0;
-//        }
+      case 1:
+      // ---------- map setup ----------
+        if (start){
+          SetupSolo ();
+          start = 0;
+        }
+
+        setup_P1 ();
 //        // ---------- vidas ----------
 //        vidasJ1(P1.vidas);
 //
@@ -378,7 +277,7 @@ void loop() {
 //        }
 //      }
 //
-//      break;
+      break;
 //***************************************************************************************************************************************
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
 //***************************************************************************************************************************************
@@ -417,20 +316,9 @@ void loop() {
 void SetupMenu (){
   //limpiar pantalla
   LCD_Clear(0x00);
-
-  //limites de las naves
-
-
-  //spawnear la nave 1
-  LCD_Bitmap(shipP1.pos.ejeX, shipP1.pos.ejeY, shipP1.dimension.ancho, shipP1.dimension.alto, nave1);
   
-  //reiniciar los scores
-//  P1.score = 0;
-//  P2.score = 0; 
-
   LCD_Bitmap (62, 15, 195, 30, titulo);
   LCD_Print ("Shoot to select a game mode", 40, 210, 1, 0xFFFF, 0x0);
-
 
   //Ventana un jugador
   Rect (7, 70, 143, 65, 0xFFFF);
@@ -443,26 +331,45 @@ void SetupMenu (){
   LCD_Bitmap (215, 100, 15, 15, nave1);
   LCD_Bitmap (245, 100, 15, 15, nave2);
 
-  
+
+  //condiciones iniciales de las naves
+  shipP1.dimension = {15, 15};
+  shipP1.pos = {155, 170};
+  shipP1.mils = {0, 5};
+  shipP1.player = {0, 2};
+  shipP1.limites = {0,304, 0, 250};
+
+  shipP2 = shipP1;
+
+  shipNPC1.dimension = {15, 15};
+  shipNPC1.pos = {0, 100};
+  shipNPC1.mils = {0,20};
+  shipNPC1.info = {0,0,0};
+
+  bulletP1.dimension = {8, 3};
+  bulletP1.mils = {0, 2};
+  bulletP1.info = {0,0,0};
+
+  //aparecer la nave 1
+  spawn_ship (nave1, &shipP1);
+
 }
 
 void SetupSolo () {
-    //lineas
+//lineas
   LCD_Clear(0x0);
   H_line(0, 191, 319, 0xFFFF);
-
-  
 // ********** text **********
- LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
- LCD_Print("Solo Mode", 5, 195, 1, 0xFFFF, 0x0000);
- LCD_Print("Score:", 260, 195, 1, 0xFFFF, 0x0000);
-
+  LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+  LCD_Print("Solo Mode", 5, 195, 1, 0xFFFF, 0x0000);
+  LCD_Print("Score:", 260, 195, 1, 0xFFFF, 0x0000);
 // ********** vidas J1 **********
- LCD_Bitmap(5,210,15,15,nave1);
- LCD_Bitmap(22,210,15,15,nave1);
- LCD_Bitmap(39,210,15,15,nave1);
+  LCD_Bitmap(5,210,15,15,nave1);
+  LCD_Bitmap(22,210,15,15,nave1);
+  //LCD_Bitmap(39,210,15,15,nave1);
 // ********** nave J1 **********
-// LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
+  shipP1.pos = {155, 170};
+  spawn_ship (nave1, &shipP1);
 }
 
 void SetupDuos (){
@@ -483,37 +390,21 @@ void SetupDuos (){
  LCD_Bitmap(282,210,15,15,nave2);
  LCD_Bitmap(299,210,15,15,nave2);
  // ********** naves J1 y J2 **********
-// LCD_Bitmap(P1.ejeX, P1.ejeY, P1.ancho, P1.alto, nave1);
-// LCD_Bitmap(P2.ejeX, P2.ejeY, P2.ancho, P2.alto, nave2);
-// // ********** balas **********
-//  bulletP1.hit = 0;
-//  bulletP1.active = 0;
-//  bulletP2.hit = 0;
-//  bulletP2.active = 0;
-//}
+
+ // ********** balas **********
 }
 
 void GameOver(void)
 {
   LCD_Clear(0x0);
-  //LCD_Bitmap (10, 10, 293, 33, gameover);
   LCD_Print("Game Over", 10, 10, 2, 0xFFFF, 0x0);
 }
 
 
 
-void vidasJ1(short j1)
-{
-  switch(j1)
-  {
-//  case 3:
-//    LCD_Bitmap(5,210,15,15,nave1);
-//    LCD_Bitmap(22,210,15,15,nave1);
-//    LCD_Bitmap(39,210,15,15,nave1);
-//    break;
-  case 2:
-    //LCD_Bitmap(5,210,15,15,nave1);
-    //LCD_Bitmap(22,210,15,15,nave1);
+void vidasJI (struct entity *sel){
+  switch(sel->player.vidas){
+    case 2:
     FillRect(39,210,15,15,0x0);
     break;
   case 1:
@@ -530,15 +421,33 @@ void vidasJ1(short j1)
   }
 }
 
+//void vidasJ1(short j1)
+//{
+//  switch(j1)
+//  {
+//  case 2:
+//    //LCD_Bitmap(5,210,15,15,nave1);
+//    //LCD_Bitmap(22,210,15,15,nave1);
+//    FillRect(39,210,15,15,0x0);
+//    break;
+//  case 1:
+//    //LCD_Bitmap(5,210,15,15,nave1);
+//    FillRect(22,210,15,15,0x0);
+//    FillRect(39,210,15,15,0x0);
+//    break;
+//  case 0:
+//    FillRect(2,210,15,15,0x0);
+//    FillRect(22,210,15,15,0x0);
+//    FillRect(39,210,15,15,0x0);
+//    estado_juego = 3;
+//    break;
+//  }
+//}
+
 void vidasJ2(short j2)
 {
   switch(j2)
   {
-//    case 3:
-//      LCD_Bitmap(265,210,15,15,nave2);
-//      LCD_Bitmap(282,210,15,15,nave2);
-//      LCD_Bitmap(299,210,15,15,nave2);
-//      break;
     case 2:
       //LCD_Bitmap(265,210,15,15,nave2);
       //LCD_Bitmap(282,210,15,15,nave2);
@@ -572,11 +481,13 @@ void ScoreDuosMode(int scorej1, int scorej2)
   LCD_Print(String(scorej2), 290, 195, 1, 0xFFFF, 0x0);
 }
 
-
+void spawn_ship (unsigned char tipo [], struct entity *sel){
+  LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
+}
 //---------------------funciones para entidades -----------------------------------------
-void move_player (unsigned char tipo [], struct entity *sel, short mini, short maxi){
+void move_player (unsigned char tipo [], struct entity *sel){
   if (currentMillis - sel->mils.previo >= sel->mils.interval){
-    if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && sel->pos.ejeX < maxi){
+    if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && sel->pos.ejeX < sel->limites.maxiX){
       (sel->pos.ejeX) ++;
 
       LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
@@ -585,7 +496,7 @@ void move_player (unsigned char tipo [], struct entity *sel, short mini, short m
       V_line ((sel->pos.ejeX) +1 + (sel->dimension.ancho), sel->pos.ejeY, sel->dimension.ancho, 0x0);
     }
 
-    if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && sel->pos.ejeX > mini){
+    if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && sel->pos.ejeX > sel->limites.miniX){
       (sel->pos.ejeX) --;
 
       LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
@@ -596,37 +507,6 @@ void move_player (unsigned char tipo [], struct entity *sel, short mini, short m
     sel->mils.previo = currentMillis;
   }
 }
-
-
-//atento a habilitar la condicional de movimiento
-//esta funcion permite mover algun objeto pre_existente a lo largo del eje X, se pued variar la velocidad a la que se mueve en base a la funcion Millis
-//void mover_nave_ejeX (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval){
-//  //revisa que hayan pasado los suficiente millis para moverse, es decir la velocidad a la que se puede mover
-//  if (currentMillis - *PrevMillis >= interval){
-//
-//    //mover a la derecha
-//    if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionX < maxiX){
-//      //se incrementa la posicion del objeto en el eje X  
-//      (*posicionX)++;
-//
-//      //cargar el bitmap nueva mente pero con el desplasamiento
-//      LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-//
-//      //se utilizan para borrar las orillas del model, es decir que no se ve su trazo
-//      V_line((*posicionX) - 1, posicionY, ancho ,0x0);
-//      V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
-//    }
-//  
-//    //mover izquierda, mismo proceso que a la derecha
-//    if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionX > miniX){
-//      (*posicionX)--;
-//      LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
-//      V_line((*posicionX) - 1, posicionY, ancho ,0x0);
-//      V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
-//    }
-//    *PrevMillis = currentMillis;
-//  }
-//}
 
 //pude mover un NPC a cualquier direccion
 void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion){
@@ -700,75 +580,7 @@ void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short max
     sel->mils.previo = currentMillis;
   }
 }
-//#define UP 0
-//#define DOWN 1
-//#define LEFT 2
-//#define RIGHT 3
 
-//pude mover un PNC a cualquier direccion
-//void move_NPC (unsigned char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag){
-//  //chequea los millis para ell moviemiento, la velociad
-//  if (currentMillis - *PrevMillis >= interval){
-//    //permite elegir la dirccion a la que se movera el enmigo
-//    switch (direccion){
-//      case UP:
-//        //revisa que no haya llegado al limite y la bandera este apagada
-//        if ((*pos_change) > mini && !(*flag)){
-//          (*pos_change)--;
-//          LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
-//          H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
-//          H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
-//        }
-//        // en el caso de llegar al limite se enciende la bandera
-//        else {
-//          *flag = 1;
-//        }
-//        break;
-//  
-//      case DOWN:
-//        if ((*pos_change) < maxi && !(*flag)) {
-//          (*pos_change)--;
-//          LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
-//          H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
-//          H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
-//        }
-//        else {
-//          *flag = 1;
-//        }
-//        break;
-//
-//      case LEFT:
-//        if ((*pos_change) > mini && !(*flag)) {
-//          (*pos_change)--;
-//          LCD_Bitmap(*pos_change, pos_cons, ancho, alto, tipo);
-//          V_line((*pos_change) - 1, pos_cons, alto, 0x0);
-//          V_line((*pos_change) +1 + ancho, pos_cons, alto, 0x0);
-//        }
-//        else {
-//          *flag = 1;
-//        }
-//        break;
-//        
-//      case RIGHT:
-//        if ((*pos_change) < maxi && !(*flag)) {
-//          (*pos_change)++;
-//          LCD_Bitmap(*pos_change, pos_cons, ancho, alto, tipo);
-//          V_line((*pos_change) - 1, pos_cons, alto, 0x0);
-//          V_line((*pos_change) + 1 + ancho, pos_cons, alto, 0x0);
-//        }
-//        else {
-//          *flag = 1;
-//        }
-//        break;
-//
-//      //en el peor de los casos la bandera se pone en 2
-//      default:
-//        *flag = 2;
-//        break;
-//    }
-//    *PrevMillis = currentMillis;
-//  }
-//}
 
 void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo
@@ -777,42 +589,22 @@ void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *s
     sel->pos.ejeY = (sel_ref.pos.ejeY) - (sel->dimension.alto);
     sel->info.active = 1;
     sel->info.hit = 0;
-    H_line (5, 10, 100, 0xFF);
   }
-//  //la bala ya esta activa y no ha golpeado con nada
-//  if (sel->info.active && !(sel->info.hit)){
-//    //si se sale de la pantalle reiniciar el disparo
-//    if (sel->pos.ejeY < -(sel->dimension.alto)){
-//      sel->info.active = 0;
-//      sel->info.hit = 0;
-//    }
-//
-//    //la bala se encuentra dentro de la pantalla
-//    else {
-//      if (currentMillis - (sel->mils.previo) >= (sel->mils.interval)){
-//        sel->mils.previo = currentMillis;
-//
-//        (sel->pos.ejeY) --;
-//        LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
-//      }
-//    }
-//}
 }
 
-void disparo_volando2 (unsigned char tipo [], struct entity *sel){
+void disparo_volando (unsigned char tipo [], struct entity *sel){
   //disparo activo y no ha golpeado nada
   if ((sel->info.active) && !(sel -> info.hit)){
 
     //disparo activo y fuera de la pantalla
-    if ((sel->pos.ejeY) < -(sel->dimension.alto)) {
+    if (sel->pos.ejeY < -(sel->dimension.alto)) {
       sel-> info.active = 0;
-      sel-> info.hit = 0;
-      //H_line (20, 30, 100, 0xFF45);
+      sel-> info.hit = 1;
     }
 
     //disparo activo y dentro de la pantalla
     else {
-      if (currentMillis - (sel->mils.previo) >= (sel ->mils.interval)){
+      if (currentMillis - (sel->mils.previo) >= sel->mils.interval){
         sel ->mils.previo = currentMillis;
         (sel ->pos.ejeY) --;
         LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
@@ -820,8 +612,6 @@ void disparo_volando2 (unsigned char tipo [], struct entity *sel){
     }
   }
 }
-
-
 
 void shoot_NPC (unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo con frecuencia
@@ -833,87 +623,35 @@ void shoot_NPC (unsigned char tipo[], struct entity sel_ref, struct entity *sel)
     sel-> info.hit = 0;
   }
 }
-//permite controlar un objeto que este volando a traves de la pantalla, un disparo de las naves
-//void disparo_volando (unsigned char tipo [], char *active, char *hit, char ancho, char alto, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo){
-//  //de primero ve si el disparo esta activo y no haya golpeado algo
-//  if ((*active) && !(*hit)){
-//    //si se sale de la pantalla reiniciar el estado del disparo
-//    if (*posicionY < - (alto)){
-//      *active = 0;
-//      *hit = 0;
-//    }
-//
-//    //el disparo esta dentro de la pantalla
-//    else {
-//      //controlar la velocidad del disparo
-//      if (currentMillis - (*previo) >= intervalo){
-//        //actualizar su valor para que siga funcionando piola
-//        *previo = currentMillis;
-//        //hace que l disparo suba una casilla
-//        (*posicionY) --;
-//        //actualizar su bitmap, en esta caso no es necesario ir borrando ya que tiene lineas negras arriva y abajo
-//        LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
-//      }
-//    }
-//  }
-//}
 
-////estar atento a la condicion de disparo
-//void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit){
-//  if (!digitalRead(SW1) && !digitalRead(SW2) && !(*active)){
-//    *posicionX = refX + 6;
-//    *posicionY = refY - 8;
-//    *active = 1;
-//    *hit = 0;
-//  }
-//}
+void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship){
+  if (NPC->info.active && bala->info.active){
+    if (bala->pos.ejeY <= NPC->pos.ejeY){
+      if (((bala->pos.ejeX) + (bala->dimension.ancho) <= NPC->pos.ejeX) && (bala->pos.ejeX >= NPC->pos.ejeX)){
+        NPC->info.active = 0;
+        bala->info.hit=1;
+        ship->player.score = (ship->player.score)+5;
 
-//void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo) {
-//  if (currentMillis - (*previo) >= intervalo){
-//    *previo = currentMillis;
-//    *posicionX = refX + 6;
-//    *posicionY = refY - 8;
-//    *active = 1;
-//    *hit = 0;
-//  }
-//}
-
-
-//setup para la nave del jugador 1
-
-//move_player (unsigned char tipo [], struct entity *sel, short mini, short maxi)
-//void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *sel)
-void setup_P1 () {
-  move_player (nave1, &shipP1, 0,200);
-  shoot_player (bullet, shipP1, &bulP1);
-  disparo_volando2 (bullet, &bulP1);
-}
-
-
-//void P1_setup () {
-//  mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax, &P1.previo, P1.intervalo);
-//  disparo_volando (bullet, &bulletP1.active, &bulletP1.hit, bulletP1.ancho, bulletP1.alto, bulletP1.ejeX, &bulletP1.ejeY, &bulletP1.previo, bulletP1.intervalo); 
-//  generar_disparo (&bulletP1.ejeX, &bulletP1.ejeY, P1.ejeX, P1.ejeY, &bulletP1.active, &bulletP1.hit);
-//}
-//
-////setup para la nave del jugador 2
-//void duos_setup () {
-//  //nave1
-//  mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, P2.ejeX-16, &P1.previo, P1.intervalo);
-//  disparo_volando (bullet, &bulletP1.active, &bulletP1.hit, bulletP1.ancho, bulletP1.alto, bulletP1.ejeX, &bulletP1.ejeY, &bulletP1.previo, bulletP1.intervalo); 
-//  generar_disparo (&bulletP1.ejeX, &bulletP1.ejeY, P1.ejeX, P1.ejeY, &bulletP1.active, &bulletP1.hit);
-//  //nave2
-//  mover_nave_ejeX (nave2, P2.ancho, P2.alto, &P2.ejeX, P2.ejeY, P1.ejeX+16, player.xMax, &P2.previo, P2.intervalo);
-//  disparo_volando (bullet, &bulletP2.active, &bulletP2.hit, bulletP2.ancho, bulletP2.alto, bulletP2.ejeX, &bulletP2.ejeY, &bulletP2.previo, bulletP2.intervalo); 
-//  generar_disparo (&bulletP2.ejeX, &bulletP2.ejeY, P2.ejeX, P2.ejeY, &bulletP2.active, &bulletP2.hit);
-//}
-
-void boom (unsigned char tipo [], short ejeX, short ejeY){
-  for (char i = 0; i < 5; i++){
-    LCD_Sprite(ejeX-12, ejeY-10, 32, 32, tipo, 5, i, 0, 0);
-    delay(20);
+        boom (explosion_bad, *NPC);
+      }
+    }
   }
 }
+
+void boom (unsigned char tipo[], struct entity sel){
+  for (char i = 0; i < 5; i++){
+    LCD_Sprite((sel.pos.ejeX) - 12, (sel.pos.ejeX) +10, 32, 32, tipo, 5, i, 0, 0);
+    delay(20);  
+  }
+}
+
+void setup_P1 () {
+  move_player (nave1, &shipP1);
+  shoot_player (bullet, shipP1, &bulletP1);
+  disparo_volando (bullet, &bulletP1);
+}
+
+
 
 
 
