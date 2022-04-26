@@ -86,8 +86,14 @@ struct object {
 };
                                                
 //balas de ambos jugadores
+<<<<<<< Updated upstream
 object bulletP1;
 object bulletP2;
+=======
+struct object bulletP1 = {0,0, 8, 3, 0, 0, 0, 2};
+struct object bulletP2 = bulletP1;
+struct object bulletE1 = {0,0, 8, 3, 0, 0, 0, 2};
+>>>>>>> Stashed changes
 
 
 //------------------- limites ---------------------------
@@ -256,6 +262,7 @@ void loop() {
       vidasJ1(P1.vidas);
       P1.vidas = 2;
 
+<<<<<<< Updated upstream
       // ---------- puntos ----------
       ScoreSoloMode(P1.score);
       
@@ -303,6 +310,39 @@ void loop() {
       }
       
       
+=======
+        // ---------- puntos ----------
+        ScoreSoloMode(P1.score);
+        nivelSolo(P1.score);
+        
+        // ---------- movimiento y disparos nave 1----------
+        P1_setup ();
+
+        // ---------- movimiento y disparos enemy1----------
+        if (bad1.flag == 0){
+          move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, RIGHT, &bad1.flag); 
+        }
+//        if (bad2.flag == 0){
+//          move_NPC(enemy1, bad2.ancho, bad2.alto, bad2.ejeY, &bad2.ejeX, enemy.xMin, enemy.xMax-30, &bad2.previo, bad2.intervalo, RIGHT, &bad2.flag);   
+//        }
+//        if (bad3.flag == 0){
+//          move_NPC(enemy1, bad3.ancho, bad3.alto, bad3.ejeY, &bad3.ejeX, enemy.xMin, enemy.xMax-60, &bad3.previo, bad3.intervalo, RIGHT, &bad3.flag);   
+//        }
+//        if (bad4.flag == 0){
+//          move_NPC(enemy1, bad4.ancho, bad4.alto, bad4.ejeY, &bad4.ejeX, enemy.xMin, enemy.xMax-90, &bad4.previo, bad4.intervalo, RIGHT, &bad4.flag);   
+//        }
+//        if (bad5.flag == 0){
+//          move_NPC(enemy1, bad5.ancho, bad5.alto, bad5.ejeY, &bad5.ejeX, enemy.xMin, enemy.xMax-120, &bad5.previo, bad5.intervalo, RIGHT, &bad5.flag);   
+//        }
+//        if (bad6.flag == 0){
+//          move_NPC(enemy1, bad6.ancho, bad6.alto, bad6.ejeY, &bad6.ejeX, enemy.xMin, enemy.xMax-150, &bad6.previo, bad6.intervalo, RIGHT, &bad6.flag);   
+//        }
+
+//void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo)
+//        if (bad1.ejeX == 100 || bad1.ejeX == 200){
+//          generar_disparo_NPC(&bad1.ejeX+6, &bad1.ejeY, bad1.ejeX, bad1.ejeY, );
+//        }
+>>>>>>> Stashed changes
 
       
       break;
@@ -585,6 +625,273 @@ void ScoreDuosMode(int scorej1, int scorej2)
 }
 
 
+<<<<<<< Updated upstream
+=======
+//atento a habilitar la condicional de movimiento
+//esta funcion permite mover algun objeto pre_existente a lo largo del eje X, se pued variar la velocidad a la que se mueve en base a la funcion Millis
+void mover_nave_ejeX (const char tipo [], unsigned char ancho, unsigned char alto,  short *posicionX, short posicionY, short miniX, short maxiX, unsigned long *PrevMillis, unsigned long interval){
+  //revisa que hayan pasado los suficiente millis para moverse, es decir la velocidad a la que se puede mover
+  if (currentMillis - *PrevMillis >= interval){
+
+    //mover a la derecha
+    if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && *posicionX < maxiX){
+      //se incrementa la posicion del objeto en el eje X  
+      (*posicionX)++;
+
+      //cargar el bitmap nueva mente pero con el desplasamiento
+      LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+
+      //se utilizan para borrar las orillas del model, es decir que no se ve su trazo
+      V_line((*posicionX) - 1, posicionY, ancho ,0x0);
+      V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
+    }
+  
+    //mover izquierda, mismo proceso que a la derecha
+    if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && *posicionX > miniX){
+      (*posicionX)--;
+      LCD_Bitmap(*posicionX, posicionY, ancho, alto, tipo);
+      V_line((*posicionX) - 1, posicionY, ancho ,0x0);
+      V_line((*posicionX) + 1 +ancho, posicionY, ancho ,0x0);
+    }
+    *PrevMillis = currentMillis;
+  }
+}
+
+
+//#define UP 0
+//#define DOWN 1
+//#define LEFT 2
+//#define RIGHT 3
+
+//pude mover un PNC a cualquier direccion
+void move_NPC (const char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag){
+  //chequea los millis para ell moviemiento, la velociad
+  if (currentMillis - *PrevMillis >= interval){
+    //permite elegir la dirccion a la que se movera el enmigo
+    switch (direccion){
+      case UP:
+        //revisa que no haya llegado al limite y la bandera este apagada
+        if ((*pos_change) > mini && !(*flag)){
+          (*pos_change)--;
+          LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
+          H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
+          H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
+        }
+        // en el caso de llegar al limite se enciende la bandera
+        else {
+          *flag = 1;
+        }
+        break;
+  
+      case DOWN:
+        if ((*pos_change) < maxi && !(*flag)) {
+          (*pos_change)--;
+          LCD_Bitmap(pos_cons, *pos_change, ancho, alto, tipo);
+          H_line(pos_cons, (*pos_change) - 1, alto, 0x0);
+          H_line(pos_cons, (*pos_change) + 1 + alto, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+
+      case LEFT:
+        if ((*pos_change) > mini && !(*flag)) {
+          (*pos_change)--;
+          LCD_Bitmap(*pos_change, pos_cons, ancho, alto, tipo);
+          V_line((*pos_change) - 1, pos_cons, alto, 0x0);
+          V_line((*pos_change) +1 + ancho, pos_cons, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+        
+      case RIGHT:
+        if ((*pos_change) < maxi && !(*flag)) {
+          (*pos_change)++;
+          LCD_Bitmap(*pos_change, pos_cons, ancho, alto, tipo);
+          V_line((*pos_change) - 1, pos_cons, alto, 0x0);
+          V_line((*pos_change) + 1 + ancho, pos_cons, alto, 0x0);
+        }
+        else {
+          *flag = 1;
+        }
+        break;
+
+      //en el peor de los casos la bandera se pone en 2
+      default:
+        *flag = 2;
+        break;
+    }
+    *PrevMillis = currentMillis;
+  }
+}
+
+//permite controlar un objeto que este volando a traves de la pantalla, un disparo de las naves
+void disparo_volando (const char tipo [], char *active, char *hit, char ancho, char alto, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo){
+  //de primero ve si el disparo esta activo y no haya golpeado algo
+  if ((*active) && !(*hit)){
+    //si se sale de la pantalla reiniciar el estado del disparo
+    if (*posicionY < - (alto)){
+      *active = 0;
+      *hit = 0;
+    }
+
+    //el disparo esta dentro de la pantalla
+    else {
+      //controlar la velocidad del disparo
+      if (currentMillis - (*previo) >= intervalo){
+        //actualizar su valor para que siga funcionando piola
+        *previo = currentMillis;
+        //hace que l disparo suba una casilla
+        (*posicionY) --;
+        //actualizar su bitmap, en esta caso no es necesario ir borrando ya que tiene lineas negras arriva y abajo
+        LCD_Bitmap(posicionX, *posicionY, ancho, alto, tipo);
+      }
+    }
+  }
+}
+
+//estar atento a la condicion de disparo
+void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit){
+  if (!digitalRead(SW1) && !digitalRead(SW2) && !(*active)){
+    *posicionX = refX + 6;
+    *posicionY = refY - 8;
+    *active = 1;
+    *hit = 0;
+  }
+}
+
+void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo) {
+  if (currentMillis - (*previo) >= intervalo){
+    *previo = currentMillis;
+    *posicionX = refX + 6;
+    *posicionY = refY - 8;
+    *active = 1;
+    *hit = 0;
+  }
+}
+
+
+//setup para la nave del jugador 1
+void P1_setup () {
+  mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, player.xMax, &P1.previo, P1.intervalo);
+  disparo_volando (bullet, &bulletP1.active, &bulletP1.hit, bulletP1.ancho, bulletP1.alto, bulletP1.ejeX, &bulletP1.ejeY, &bulletP1.previo, bulletP1.intervalo); 
+  generar_disparo (&bulletP1.ejeX, &bulletP1.ejeY, P1.ejeX, P1.ejeY, &bulletP1.active, &bulletP1.hit);
+}
+
+//setup para la nave del jugador 2
+void duos_setup () {
+  //nave1
+  mover_nave_ejeX (nave1, P1.ancho, P1.alto, &P1.ejeX, P1.ejeY, player.xMin, P2.ejeX-16, &P1.previo, P1.intervalo);
+  disparo_volando (bullet, &bulletP1.active, &bulletP1.hit, bulletP1.ancho, bulletP1.alto, bulletP1.ejeX, &bulletP1.ejeY, &bulletP1.previo, bulletP1.intervalo); 
+  generar_disparo (&bulletP1.ejeX, &bulletP1.ejeY, P1.ejeX, P1.ejeY, &bulletP1.active, &bulletP1.hit);
+  //nave2
+  mover_nave_ejeX (nave2, P2.ancho, P2.alto, &P2.ejeX, P2.ejeY, P1.ejeX+16, player.xMax, &P2.previo, P2.intervalo);
+  disparo_volando (bullet, &bulletP2.active, &bulletP2.hit, bulletP2.ancho, bulletP2.alto, bulletP2.ejeX, &bulletP2.ejeY, &bulletP2.previo, bulletP2.intervalo); 
+  generar_disparo (&bulletP2.ejeX, &bulletP2.ejeY, P2.ejeX, P2.ejeY, &bulletP2.active, &bulletP2.hit);
+}
+
+void boom (const char tipo [], short ejeX, short ejeY){
+  for (char i = 0; i < 5; i++){
+    LCD_Sprite(ejeX-12, ejeY-10, 32, 32, tipo, 5, i, 0, 0);
+    delay(20);
+  }
+}
+
+
+
+void hitbox1(void){
+  //hitbox menu
+      if (bulletP1.ejeY == bad1.ejeY+15){
+        if (bulletP1.ejeX <= bad1.ejeX + bad1.ancho && bulletP1.ejeX >= bad1.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad1.flag = 1;
+          boom (explosion_bad, bad1.ejeX, bad1.ejeY);
+          bad1.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 2
+      if (bulletP1.ejeY == bad2.ejeY+15){
+        if (bulletP1.ejeX <= bad2.ejeX + bad2.ancho && bulletP1.ejeX >= bad2.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad2.flag = 1;
+          boom (explosion_bad, bad2.ejeX, bad2.ejeY);
+          bad2.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 3
+      if (bulletP1.ejeY == bad3.ejeY+15){
+        if (bulletP1.ejeX <= bad3.ejeX + bad3.ancho && bulletP1.ejeX >= bad3.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad3.flag = 1;
+          boom (explosion_bad, bad3.ejeX, bad3.ejeY);
+          bad3.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 4
+      if (bulletP1.ejeY == bad4.ejeY+15){
+        if (bulletP1.ejeX <= bad4.ejeX + bad4.ancho && bulletP1.ejeX >= bad4.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad4.flag = 1;
+          boom (explosion_bad, bad4.ejeX, bad4.ejeY);
+          bad4.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 5
+      if (bulletP1.ejeY == bad5.ejeY+15){
+        if (bulletP1.ejeX <= bad5.ejeX + bad5.ancho && bulletP1.ejeX >= bad5.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad5.flag = 1;
+          boom (explosion_bad, bad5.ejeX, bad5.ejeY);
+          bad5.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 6
+      if (bulletP1.ejeY == bad6.ejeY+15){
+        if (bulletP1.ejeX <= bad6.ejeX + bad6.ancho && bulletP1.ejeX >= bad6.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad6.flag = 1;
+          boom (explosion_bad, bad6.ejeX, bad6.ejeY);
+          bad6.ejeX = -15;
+        }
+      }
+}
+
+
+void nivelSolo (int s){
+  if (s >= 30)
+  {
+    LCD_Print("2", 200, 200, 2, 0xFFFF, 0x0);
+  }
+}
+
+
+
+
+
+
+
+
+>>>>>>> Stashed changes
 
 
 //***************************************************************************************************************************************
@@ -871,7 +1178,7 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 //***************************************************************************************************************************************
 // Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
 //***************************************************************************************************************************************
-void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]) {
+void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, const char bitmap[]) {
   LCD_CMD(0x02c); // write_memory_start
   digitalWrite(LCD_RS, HIGH);
   digitalWrite(LCD_CS, LOW);
@@ -896,3 +1203,41 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 //***************************************************************************************************************************************
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
 //***************************************************************************************************************************************
+<<<<<<< Updated upstream
+=======
+void LCD_Sprite(int x, int y, int width, int height, const char bitmap[], int columns, int index, char flip, char offset) {
+  LCD_CMD(0x02c); // write_memory_start
+  digitalWrite(LCD_RS, HIGH);
+  digitalWrite(LCD_CS, LOW);
+
+  unsigned int x2, y2;
+  x2 =   x + width;
+  y2 =    y + height;
+  SetWindows(x, y, x2 - 1, y2 - 1);
+  int k = 0;
+  int ancho = ((width * columns));
+  if (flip) {
+    for (int j = 0; j < height; j++) {
+      k = (j * (ancho) + index * width - 1 - offset) * 2;
+      k = k + width * 2;
+      for (int i = 0; i < width; i++) {
+        LCD_DATA(bitmap[k]);
+        LCD_DATA(bitmap[k + 1]);
+        k = k - 2;
+      }
+    }
+  } else {
+    for (int j = 0; j < height; j++) {
+      k = (j * (ancho) + index * width + 1 + offset) * 2;
+      for (int i = 0; i < width; i++) {
+        LCD_DATA(bitmap[k]);
+        LCD_DATA(bitmap[k + 1]);
+        k = k + 2;
+      }
+    }
+
+
+  }
+  digitalWrite(LCD_CS, HIGH);
+}
+>>>>>>> Stashed changes
