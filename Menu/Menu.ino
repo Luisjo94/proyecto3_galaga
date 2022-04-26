@@ -89,6 +89,11 @@ struct enemy {
 };
 //Posicion enemigo
 struct enemy bad1 = {0, 100, 15, 15, 0, 20};
+struct enemy bad2 = {-30, 100, 15, 15, 0, 20};
+struct enemy bad3 = {-60, 100, 15, 15, 0, 20};
+struct enemy bad4 = {-90, 100, 15, 15, 0, 20};
+struct enemy bad5 = {-120, 100, 15, 15, 0, 20};
+struct enemy bad6 = {-150, 100, 15, 15, 0, 20};
 
 //------------------- disparos ---------------------------
 struct object {
@@ -250,35 +255,26 @@ void loop() {
         if (bad1.flag == 0){
           move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, RIGHT, &bad1.flag); 
         }
-          
-          //move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, LEFT, &bad1.flag);
-        
-
-        //hitbox menu
-      if (bulletP1.ejeY == bad1.ejeY+15){
-        if (bulletP1.ejeX <= bad1.ejeX + bad1.ancho && bulletP1.ejeX >= bad1.ejeX && bulletP1.active){
-          P1.score = P1.score+5;
-          bulletP1.hit = 1;
-          bulletP1.active = 0;
-          bad1.flag = 1;
-
-          boom (explosion_bad, bad1.ejeX, bad1.ejeY);
-          
-          for (char i = 0; i < 5; i++)
-          {
-            LCD_Sprite(bad1.ejeX-12, bad1.ejeY-10, 32, 32, explosion_bad, 5, i, 0, 0);
-            delay(20);
-          }
-          bad1.ejeX = -15;
-          
+        if (bad2.flag == 0){
+          move_NPC(enemy1, bad2.ancho, bad2.alto, bad2.ejeY, &bad2.ejeX, enemy.xMin, enemy.xMax-30, &bad2.previo, bad2.intervalo, RIGHT, &bad2.flag);   
         }
-      }
+        if (bad3.flag == 0){
+          move_NPC(enemy1, bad3.ancho, bad3.alto, bad3.ejeY, &bad3.ejeX, enemy.xMin, enemy.xMax-60, &bad3.previo, bad3.intervalo, RIGHT, &bad3.flag);   
+        }
+        if (bad4.flag == 0){
+          move_NPC(enemy1, bad4.ancho, bad4.alto, bad4.ejeY, &bad4.ejeX, enemy.xMin, enemy.xMax-90, &bad4.previo, bad4.intervalo, RIGHT, &bad4.flag);   
+        }
+        if (bad5.flag == 0){
+          move_NPC(enemy1, bad5.ancho, bad5.alto, bad5.ejeY, &bad5.ejeX, enemy.xMin, enemy.xMax-120, &bad5.previo, bad5.intervalo, RIGHT, &bad5.flag);   
+        }
+        if (bad6.flag == 0){
+          move_NPC(enemy1, bad6.ancho, bad6.alto, bad6.ejeY, &bad6.ejeX, enemy.xMin, enemy.xMax-150, &bad6.previo, bad6.intervalo, RIGHT, &bad6.flag);   
+        }
+
+        hitbox1();
 
       break;
-//***************************************************************************************************************************************
-// Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
-//***************************************************************************************************************************************
-//void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset)
+
       // ****************************** DUOS MODE ******************************
       case 2:
         if (start){
@@ -642,7 +638,79 @@ void boom (unsigned char tipo [], short ejeX, short ejeY){
 
 
 
+void hitbox1(void){
+  //hitbox menu
+      if (bulletP1.ejeY == bad1.ejeY+15){
+        if (bulletP1.ejeX <= bad1.ejeX + bad1.ancho && bulletP1.ejeX >= bad1.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad1.flag = 1;
+          boom (explosion_bad, bad1.ejeX, bad1.ejeY);
+          bad1.ejeX = -15;
+        }
+      }
 
+      //hitbox menu 2
+      if (bulletP1.ejeY == bad2.ejeY+15){
+        if (bulletP1.ejeX <= bad2.ejeX + bad2.ancho && bulletP1.ejeX >= bad2.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad2.flag = 1;
+          boom (explosion_bad, bad2.ejeX, bad2.ejeY);
+          bad2.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 3
+      if (bulletP1.ejeY == bad3.ejeY+15){
+        if (bulletP1.ejeX <= bad3.ejeX + bad3.ancho && bulletP1.ejeX >= bad3.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad3.flag = 1;
+          boom (explosion_bad, bad3.ejeX, bad3.ejeY);
+          bad3.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 4
+      if (bulletP1.ejeY == bad4.ejeY+15){
+        if (bulletP1.ejeX <= bad4.ejeX + bad4.ancho && bulletP1.ejeX >= bad4.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad4.flag = 1;
+          boom (explosion_bad, bad4.ejeX, bad4.ejeY);
+          bad4.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 5
+      if (bulletP1.ejeY == bad5.ejeY+15){
+        if (bulletP1.ejeX <= bad5.ejeX + bad5.ancho && bulletP1.ejeX >= bad5.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad5.flag = 1;
+          boom (explosion_bad, bad5.ejeX, bad5.ejeY);
+          bad5.ejeX = -15;
+        }
+      }
+
+      //hitbox menu 6
+      if (bulletP1.ejeY == bad6.ejeY+15){
+        if (bulletP1.ejeX <= bad6.ejeX + bad6.ancho && bulletP1.ejeX >= bad6.ejeX && bulletP1.active){
+          P1.score = P1.score+5;
+          bulletP1.hit = 1;
+          bulletP1.active = 0;
+          bad6.flag = 1;
+          boom (explosion_bad, bad6.ejeX, bad6.ejeY);
+          bad6.ejeX = -15;
+        }
+      }
+}
 
 
 
