@@ -99,8 +99,10 @@ struct entity shipP2;
 
 struct entity shipNPC1;
 
+
 struct entity bulletP1;
 struct entity bulletP2;
+
 
 //------------------- limites
 //------------------- Estado del juego ----------------------
@@ -192,7 +194,6 @@ void setup() {
   
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
-
 
 
 }
@@ -333,6 +334,8 @@ void SetupMenu (){
 
 
   //condiciones iniciales de las naves
+
+
   shipP1.dimension = {15, 15};
   shipP1.pos = {155, 170};
   shipP1.mils = {0, 5};
@@ -421,28 +424,6 @@ void vidasJI (struct entity *sel){
   }
 }
 
-//void vidasJ1(short j1)
-//{
-//  switch(j1)
-//  {
-//  case 2:
-//    //LCD_Bitmap(5,210,15,15,nave1);
-//    //LCD_Bitmap(22,210,15,15,nave1);
-//    FillRect(39,210,15,15,0x0);
-//    break;
-//  case 1:
-//    //LCD_Bitmap(5,210,15,15,nave1);
-//    FillRect(22,210,15,15,0x0);
-//    FillRect(39,210,15,15,0x0);
-//    break;
-//  case 0:
-//    FillRect(2,210,15,15,0x0);
-//    FillRect(22,210,15,15,0x0);
-//    FillRect(39,210,15,15,0x0);
-//    estado_juego = 3;
-//    break;
-//  }
-//}
 
 void vidasJ2(short j2)
 {
@@ -581,7 +562,6 @@ void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short max
   }
 }
 
-
 void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo
   if (!digitalRead(SW1) && !digitalRead(SW2) && !(sel->info.active)){
@@ -624,10 +604,12 @@ void shoot_NPC (unsigned char tipo[], struct entity sel_ref, struct entity *sel)
   }
 }
 
+
 void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship){
   if (NPC->info.active && bala->info.active){
-    if (bala->pos.ejeY <= NPC->pos.ejeY){
-      if (((bala->pos.ejeX) + (bala->dimension.ancho) <= NPC->pos.ejeX) && (bala->pos.ejeX >= NPC->pos.ejeX)){
+    if (bala->pos.ejeY == ((NPC->pos.ejeY) - (NPC->dimension.alto)){
+      if ((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho)) && (bala->pos.ejeX >= NPC->pos.ejeX)){
+        NPC->info.flag = 1;
         NPC->info.active = 0;
         bala->info.hit=1;
         ship->player.score = (ship->player.score)+5;
