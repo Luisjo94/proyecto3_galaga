@@ -103,6 +103,13 @@ struct entity shipNPC1;
 struct entity bulletP1;
 struct entity bulletP2;
 
+<<<<<<< Updated upstream
+=======
+struct entity NPCbullet1;
+struct entity NPCbullet2;
+
+
+>>>>>>> Stashed changes
 
 //------------------- limites
 //------------------- Estado del juego ----------------------
@@ -243,6 +250,7 @@ void loop() {
         setup_P1 ();
 
         
+<<<<<<< Updated upstream
 
 //        // ---------- vidas ----------
 //        vidasJ1(P1.vidas);
@@ -281,6 +289,8 @@ void loop() {
 //        }
 //      }
 //
+=======
+>>>>>>> Stashed changes
       break;
 //***************************************************************************************************************************************
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
