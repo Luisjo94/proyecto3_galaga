@@ -156,7 +156,7 @@ void spawn_ship (unsigned char tipo [], struct entity *sel);
 
 //mover naves
 void move_player (unsigned char tipo [], struct entity *sel);
-void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion);
+void move_NPC (unsigned char tipo [], struct entity *sel, char direccion);
 
 //disparo desde nave
 void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *sel);
@@ -241,6 +241,9 @@ void loop() {
         }
 
         setup_P1 ();
+
+        
+
 //        // ---------- vidas ----------
 //        vidasJ1(P1.vidas);
 //
@@ -490,14 +493,14 @@ void move_player (unsigned char tipo [], struct entity *sel){
 }
 
 //pude mover un NPC a cualquier direccion
-void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion){
+void move_NPC (unsigned char tipo [], struct entity *sel, char direccion){
   //chequea los millis para ell moviemiento, la velociad
   if (currentMillis - sel->mils.previo >= sel->mils.interval){
     //permite elegir la dirccion a la que se movera el enmigo
     switch (direccion) {
       case UP:
       //revisa que no haya llegado al limite y la bandera este apagada
-      if ((sel->pos.ejeY) > mini && !(sel->info.flag)){
+      if (((sel->pos.ejeY) > (sel->limites.miniY)) && !(sel->info.flag)){
         (sel->pos.ejeY) --;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
@@ -513,7 +516,7 @@ void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short max
 
 
       case DOWN:
-      if ((sel->pos.ejeY) < maxi && !(sel->info.flag)){
+      if (((sel->pos.ejeY) < sel->limites.maxiY) && !(sel->info.flag)){
         (sel->pos.ejeY) ++;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
@@ -527,7 +530,7 @@ void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short max
       break;
 
       case LEFT:
-      if ((sel->pos.ejeX) > mini && !(sel->info.flag)){
+      if (((sel->pos.ejeX) > sel->limites.miniX) && !(sel->info.flag)){
         (sel->pos.ejeX) --;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
@@ -541,7 +544,7 @@ void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short max
       break;
 
       case RIGHT:
-      if ((sel->pos.ejeX) < maxi && !(sel->info.flag)){
+      if (((sel->pos.ejeX) < (sel->limites.maxiX)) && !(sel->info.flag)){
         (sel->pos.ejeX) ++;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
@@ -607,7 +610,7 @@ void shoot_NPC (unsigned char tipo[], struct entity sel_ref, struct entity *sel)
 
 void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship){
   if (NPC->info.active && bala->info.active){
-    if (bala->pos.ejeY == ((NPC->pos.ejeY) - (NPC->dimension.alto)){
+    if (bala->pos.ejeY == ((NPC->pos.ejeY) - (NPC->dimension.alto))){
       if ((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho)) && (bala->pos.ejeX >= NPC->pos.ejeX)){
         NPC->info.flag = 1;
         NPC->info.active = 0;
