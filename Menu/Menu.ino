@@ -45,6 +45,9 @@
 #define RIGHT 3
 
 
+//extern uint8_t ee[];
+//extern uint8_t gameover[];
+
 
 
 //***************************************************************************************************************************************
@@ -97,6 +100,7 @@ struct entity {
 struct entity shipP1;
 struct entity shipP2;
 
+//enemigos
 struct entity shipNPC1;
 struct entity shipNPC2;
 struct entity shipNPC3;
@@ -104,11 +108,11 @@ struct entity shipNPC4;
 struct entity shipNPC5;
 struct entity shipNPC6;
 
-
 //balas
 struct entity bulletP1;
 struct entity bulletP2;
 
+//balas enemigas
 struct entity NPCbullet1;
 
 
@@ -247,7 +251,7 @@ void loop() {
           }
         }
       }
-      
+
       break;
 
       // ****************************** SOLO MODE ******************************
@@ -270,13 +274,15 @@ void loop() {
         ScoreSoloMode(shipP1.player.score);
 
         // ---------- enemigos ----------
-        
-        //spawn_ship(enemy1, &shipNPC1); No es necesari spaqwnear la nave enemiga ya que con el movimiento aparece
+        spawn_ship(enemy1, &shipNPC1);
         move_NPC(enemy1, &shipNPC1, RIGHT);
-        shoot_NPC(bullet, shipNPC1, &NPCbullet1, 15);
+        //shoot_NPC(bullet, shipNPC1, &NPCbullet1, 15);
         disparo_volando(bullet, &NPCbullet1);
         hitboxNPC(&shipNPC1, &bulletP1, &shipP1);
-        
+
+        if (shipP1.pos.ejeX == 250){
+            shipP1.player.vidas = 0;
+        }
 
 
 //
@@ -340,6 +346,10 @@ void loop() {
         shipNPC1.pos = {0, 100};
         move_NPC(enemy1, &shipNPC1, RIGHT);
 
+        if (shipP1.pos.ejeX == 250){
+            shipP1.player.vidas = 0;
+        }
+
 
         break;
 
@@ -355,18 +365,18 @@ void loop() {
     case 6://ee
         if (start){
         LCD_Clear(0x00);
-        
+
         start = 0;
         }
-//        for (int i=0; i<6; i++){
-//        LCD_Sprite (100,70,120,110, ee, 6, i,0,0);
-//        delay(150);
-//        }
+        for (int i=0; i<6; i++){
+        LCD_Sprite (100,70,120,110, ee, 6, i,0,0);
+        delay(150);
+        }
 
         break;
 
 
-    default: 
+    default:
         estado_juego = 0;
       break;
 
@@ -412,11 +422,11 @@ void SetupMenu (){
   shipNPC1.info = {0,0,0};
 
   bulletP1.dimension = {8, 3};
-  bulletP1.mils = {0, 5};
+  bulletP1.mils = {0, 2};
   bulletP1.info = {0,0,0};
-  
 
   bulletP2 = bulletP1;
+
   NPCbullet1 = bulletP1;
   NPCbullet1.mils = {0,15};
   NPCbullet1.player = {0,8}; //el 8 sirve para identificar que es bala enemiga
@@ -469,7 +479,7 @@ void SetupDuos (){
  shipP2.pos = {303, 170};
  spawn_ship (nave1, &shipP1);
  spawn_ship (nave2, &shipP2);
- 
+
  // ********** balas **********
 }
 
@@ -505,6 +515,10 @@ void vidasJ1 (struct entity *sel){
         break;
     case 0:
         estado_juego = 3;
+        for (char i = 0; i < 5; i++){
+        LCD_Sprite((sel->pos.ejeX) - 12, (sel->pos.ejeX) +10, 32, 32, explosion_ship, 5, i, 0, 0);
+        delay(20);
+        }
         break;
   }
 }
@@ -526,9 +540,14 @@ void vidasJ2(struct entity *sel)
       FillRect(299,210,15,15,0x0);
       break;
     case 0:
-        estado_juego = 3;
-        break;
-  }
+      estado_juego = 3;
+      for (char i = 0; i < 5; i++){
+      LCD_Sprite((sel->pos.ejeX) - 12, (sel->pos.ejeX) +10, 32, 32, explosion_ship, 5, i, 0, 0);
+      delay(20);
+      }
+      break;
+    }
+
 }
 
 void ScoreSoloMode(int scorej1)
@@ -589,7 +608,7 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
       }
       // en el caso de llegar al limite se enciende la bandera
       else {
-        sel->info.flag = 1;
+        sel->info.flag = 1; //terminó de moverse hacia arriba
       }
       break;
 
@@ -600,11 +619,11 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) + (sel->dimension.alto) + 1, sel->dimension.ancho, 0x0);
-        
+
         sel->info.active = 1;
       }
       else {
-        sel->info.flag = 1;
+        sel->info.flag = 2; //terminó de moverse hacia abajo
       }
       break;
 
@@ -614,11 +633,11 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
         V_line ((sel->pos.ejeX) + (sel->dimension.ancho) +1, sel->pos.ejeY, sel->dimension.alto, 0x0);
-      
+
         sel->info.active = 1;
       }
       else {
-        sel->info.flag = 1;
+        sel->info.flag = 3; //terminó de moverse hacia la izquierda
       }
       break;
 
@@ -628,16 +647,16 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
         V_line ((sel->pos.ejeX) + (sel->dimension.ancho) +1, sel->pos.ejeY, sel->dimension.alto, 0x0);
-      
+
         sel->info.active = 1;
       }
       else {
-        sel->info.flag = 1;
+        sel->info.flag = 4; //terminó de moverse hacia la derecha
       }
       break;
 
       default:
-      sel->info.flag = 2;
+      sel->info.flag = 5;   //algo más pasó
       break;
     }
     sel->mils.previo = currentMillis;
@@ -657,57 +676,30 @@ void shoot_player (const unsigned char tipo[], struct entity sel_ref, struct ent
 void disparo_volando (const unsigned char tipo [], struct entity *sel){
   //disparo activo y no ha golpeado nada
   if ((sel->info.active) && !(sel -> info.hit)){
-    //si se trata de disparo de jugador
-    if (sel->player.vidas <= 3){
-            //disparo activo y fuera de la pantalla
-      if (sel->pos.ejeY < -(sel->dimension.alto)) {
-        sel-> info.active = 0;
-        sel-> info.hit = 1;
-      }
 
-      //disparo activo y dentro de la pantalla
-      else {
-        if (currentMillis - (sel->mils.previo) >= sel->mils.interval){
-          sel ->mils.previo = currentMillis;
-          (sel ->pos.ejeY) --;
-          LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
-        }
+    //disparo activo y fuera de la pantalla
+    if (sel->pos.ejeY < -(sel->dimension.alto)) {
+      sel-> info.active = 0;
+      sel-> info.hit = 1;
+    }
+
+    //disparo activo y dentro de la pantalla
+    else {
+      if (currentMillis - (sel->mils.previo) >= sel->mils.interval){
+        sel ->mils.previo = currentMillis;
+        (sel ->pos.ejeY) --;
+        LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
       }
     }
-    
-    //disparo de enemigo
-    else{
-      //se salio de la pantalla
-        if (sel->pos.ejeY > 180) {
-        sel-> info.active = 0;
-        sel-> info.hit = 1;
-        FillRect (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, 0x0);
-      }
-
-      //disparo activo y dentro de la pantalla
-      else {
-        if (currentMillis - (sel->mils.previo) >= sel->mils.interval){
-          sel ->mils.previo = currentMillis;
-          (sel ->pos.ejeY) ++;
-          LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
-          H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
-        }
-      }
-    }
-  }  
+  }
 }
 
-
-
-
-
-
-void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity *sel, unsigned short tiempo){
+void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo con frecuencia
-  if ((currentMillis - (sel->mils.frecuencia) >= tiempo) && !(sel->info.active) && sel_ref.info.active){
+  if ((currentMillis - (sel->mils.frecuencia) >= sel->mils.interval) && !(sel->info.active) && sel_ref.info.active){
     sel-> mils.frecuencia = currentMillis;
     sel-> pos.ejeX = sel_ref.pos.ejeX + 6;
-    sel-> pos.ejeY = (sel_ref.pos.ejeY) + (sel_ref.dimension.alto);
+    sel-> pos.ejeY = sel_ref.pos.ejeY - (sel ->dimension.alto);
     sel-> info.active = 1;
     sel-> info.hit = 0;
   }
@@ -717,26 +709,24 @@ void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity
 void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship){
   if (NPC->info.active && bala->info.active){
     if (bala->pos.ejeY == ((NPC->pos.ejeY) - (NPC->dimension.alto))){
-      if (((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho))) && (bala->pos.ejeX >= NPC->pos.ejeX)){
-        FillRect (bala->pos.ejeX, bala->pos.ejeY, bala->dimension.ancho, bala->dimension.alto, 0x0);
+      if ((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho)) && (bala->pos.ejeX >= NPC->pos.ejeX)){
         NPC->info.flag = 1;
         NPC->info.active = 0;
         bala->info.hit=1;
-        bala->info.active = 0;
-        ship->player.score = (ship->player.score)+5;
+        bala->info.active=0;
         boom (explosion_bad, *NPC);
+        ship->player.score = (ship->player.score)+5;
+
+
       }
     }
   }
 }
-//***************************************************************************************************************************************
-// Función para dibujar un rectángulo - parámetros ( coordenada x, cordenada y, ancho, alto, color)
-//***************************************************************************************************************************************
+
 void boom (const unsigned char tipo[], struct entity sel){
-  Rect ((sel.pos.ejeX)-12, sel.pos.ejeY, 32, 32, 0x0);
   for (char i = 0; i < 5; i++){
-    LCD_Sprite((sel.pos.ejeX) - 12, (sel.pos.ejeY), 32, 32, tipo, 5, i, 0, 0);
-    delay(40);
+    LCD_Sprite((sel.pos.ejeX) - 12, (sel.pos.ejeX) +10, 32, 32, tipo, 5, i, 0, 0);
+    delay(20);
   }
 }
 
@@ -752,13 +742,6 @@ void setup_P2 () {
   disparo_volando (bullet, &bulletP2);
 }
 
-void setup_nivel1 (){
-  shipNPC2 = shipNPC1;
-  shipNPC3 = shipNPC1;
-  shipNPC4 = shipNPC1;
-  shipNPC5 = shipNPC1;
-  shipNPC6 = shipNPC1;
-}
 
 
 
@@ -1118,5 +1101,3 @@ void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[
   }
   digitalWrite(LCD_CS, HIGH);
 }
-
-//
