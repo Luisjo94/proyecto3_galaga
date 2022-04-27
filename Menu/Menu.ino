@@ -259,7 +259,8 @@ void loop() {
         ScoreSoloMode(shipP1.player.score);
 
         // ---------- enemigos ----------
-        spawn_ship(enemy1, &shipNPC1);
+        
+        //spawn_ship(enemy1, &shipNPC1); No es necesari spaqwnear la nave enemiga ya que con el movimiento aparece
         move_NPC(enemy1, &shipNPC1, RIGHT);
         hitboxNPC(&shipNPC1, &bulletP1, &shipP1);
 
@@ -343,10 +344,10 @@ void loop() {
         
         start = 0;
         }
-        for (int i=0; i<6; i++){
-        LCD_Sprite (100,70,120,110, ee, 6, i,0,0);
-        delay(150);
-        }
+//        for (int i=0; i<6; i++){
+//        LCD_Sprite (100,70,120,110, ee, 6, i,0,0);
+//        delay(150);
+//        }
 
         break;
 
@@ -653,7 +654,7 @@ void disparo_volando (const unsigned char tipo [], struct entity *sel){
         LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
       }
     }
-  }
+  }  
 }
 
 void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
@@ -671,22 +672,26 @@ void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity
 void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship){
   if (NPC->info.active && bala->info.active){
     if (bala->pos.ejeY == ((NPC->pos.ejeY) - (NPC->dimension.alto))){
-      if ((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho)) && (bala->pos.ejeX >= NPC->pos.ejeX)){
+      if (((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho))) && (bala->pos.ejeX >= NPC->pos.ejeX)){
         NPC->info.flag = 1;
         NPC->info.active = 0;
         bala->info.hit=1;
+        bala->info.active = 0;
         ship->player.score = (ship->player.score)+5;
-
+        FillRect (bala->pos.ejeX, bala->pos.ejeY, bala->dimension.ancho, bala->dimension.alto, 0x0);
         boom (explosion_bad, *NPC);
       }
     }
   }
 }
-
+//***************************************************************************************************************************************
+// Función para dibujar un rectángulo - parámetros ( coordenada x, cordenada y, ancho, alto, color)
+//***************************************************************************************************************************************
 void boom (const unsigned char tipo[], struct entity sel){
+  Rect ((sel.pos.ejeX)-12, sel.pos.ejeY, 32, 32, 0x0);
   for (char i = 0; i < 5; i++){
-    LCD_Sprite((sel.pos.ejeX) - 12, (sel.pos.ejeX) +10, 32, 32, tipo, 5, i, 0, 0);
-    delay(20);
+    LCD_Sprite((sel.pos.ejeX) - 12, (sel.pos.ejeY), 32, 32, tipo, 5, i, 0, 0);
+    delay(40);
   }
 }
 
@@ -1038,7 +1043,7 @@ void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[
   int k = 0;
   int ancho = ((width * columns));
   if (flip) {
-    for (int j = 0; j < height; j++) {s
+    for (int j = 0; j < height; j++) {
       k = (j * (ancho) + index * width - 1 - offset) * 2;
       k = k + width * 2;
       for (int i = 0; i < width; i++) {
