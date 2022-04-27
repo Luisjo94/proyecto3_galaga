@@ -38,6 +38,21 @@
 #define SW1 PF_4
 #define SW2 PF_0
 
+<<<<<<< Updated upstream
+=======
+#define UP 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+
+//***************************************************************************************************************************************
+// Variables
+//***************************************************************************************************************************************
+extern const unsigned char bulletE[], bullet[];
+extern const unsigned char explosion_bad[];
+extern const unsigned char enemy1[], nave1[], nave2[];
+extern const unsigned char titulo[], gameover[];
+>>>>>>> Stashed changes
 
 //***************************************************************************************************************************************
 // Variables
@@ -318,16 +333,28 @@ void loop() {
         // ---------- movimiento y disparos nave 1----------
         P1_setup ();
 
+<<<<<<< Updated upstream
         // ---------- movimiento y disparos enemy1----------
         if (bad1.flag == 0){
           move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, RIGHT, &bad1.flag); 
         }
 //        if (bad2.flag == 0){
 //          move_NPC(enemy1, bad2.ancho, bad2.alto, bad2.ejeY, &bad2.ejeX, enemy.xMin, enemy.xMax-30, &bad2.previo, bad2.intervalo, RIGHT, &bad2.flag);   
+=======
+        setup_P1 ();
+//        
+//        // ---------- movimiento y disparos nave 1----------
+//        P1_setup ();
+//
+//        // ---------- movimiento y disparos enemy1----------
+//        if (bad1.flag == 0){
+//          move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, RIGHT, &bad1.flag); 
+>>>>>>> Stashed changes
 //        }
 //        if (bad3.flag == 0){
 //          move_NPC(enemy1, bad3.ancho, bad3.alto, bad3.ejeY, &bad3.ejeX, enemy.xMin, enemy.xMax-60, &bad3.previo, bad3.intervalo, RIGHT, &bad3.flag);   
 //        }
+<<<<<<< Updated upstream
 //        if (bad4.flag == 0){
 //          move_NPC(enemy1, bad4.ancho, bad4.alto, bad4.ejeY, &bad4.ejeX, enemy.xMin, enemy.xMax-90, &bad4.previo, bad4.intervalo, RIGHT, &bad4.flag);   
 //        }
@@ -337,6 +364,38 @@ void loop() {
 //        if (bad6.flag == 0){
 //          move_NPC(enemy1, bad6.ancho, bad6.alto, bad6.ejeY, &bad6.ejeX, enemy.xMin, enemy.xMax-150, &bad6.previo, bad6.intervalo, RIGHT, &bad6.flag);   
 //        }
+=======
+//      }
+//
+      break;
+
+      // ****************************** DUOS MODE ******************************
+      case 2:
+      // ---------- map setup ----------
+        if (start){
+          SetupDuos();
+          start = 0;
+        }
+      setup_P1();
+      setup_P2();
+//        if (start){
+//          P1.ejeX = 0;
+//          P2.ejeX = 303;
+//          SetupDuos (); //cambiar a duos despues
+//          start = 0; 
+//        }
+//
+//        // ---------- vidas ----------
+//        vidasJ1(P1.vidas);
+//        vidasJ2(P2.vidas);
+//
+//        // ---------- puntos ----------
+//        ScoreDuosMode(P1.score, P2.score);
+//
+//        // ---------- movimiento y disparos ----------
+//        duos_setup();
+        break;
+>>>>>>> Stashed changes
 
 //void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit,  unsigned long *previo, unsigned long intervalo)
 //        if (bad1.ejeX == 100 || bad1.ejeX == 200){
@@ -547,8 +606,13 @@ void SetupDuos () {
 void GameOver(void)
 {
   LCD_Clear(0x0);
+<<<<<<< Updated upstream
   //LCD_Bitmap (10, 10, 293, 33, gameover);
   LCD_Print("Game Over", 10, 10, 2, 0xFFFF, 0x0);
+=======
+  //LCD_Print("Game Over", 10, 10, 2, 0xFFFF, 0x0);
+  LCD_Bitmap(0, 0, 293, 33, gameover);
+>>>>>>> Stashed changes
 }
 
 
@@ -581,6 +645,32 @@ void vidasJ1(short j1)
   }
 }
 
+<<<<<<< Updated upstream
+=======
+void vidasJ1(short j1)
+{
+  switch(j1)
+  {
+  case 2:
+    //LCD_Bitmap(5,210,15,15,nave1);
+    //LCD_Bitmap(22,210,15,15,nave1);
+    FillRect(39,210,15,15,0x0);
+    break;
+  case 1:
+    //LCD_Bitmap(5,210,15,15,nave1);
+    FillRect(22,210,15,15,0x0);
+    FillRect(39,210,15,15,0x0);
+    break;
+  case 0:
+    FillRect(2,210,15,15,0x0);
+    FillRect(22,210,15,15,0x0);
+    FillRect(39,210,15,15,0x0);
+    estado_juego = 3;
+    break;
+  }
+}
+
+>>>>>>> Stashed changes
 void vidasJ2(short j2)
 {
   switch(j2)
@@ -624,6 +714,19 @@ void ScoreDuosMode(int scorej1, int scorej2)
   LCD_Print(String(scorej2), 290, 195, 1, 0xFFFF, 0x0);
 }
 
+<<<<<<< Updated upstream
+=======
+void spawn_ship (const unsigned char tipo [], struct entity *sel){
+  LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
+}
+//---------------------funciones para entidades -----------------------------------------
+void move_player (const unsigned char tipo [], struct entity *sel){
+  if (currentMillis - sel->mils.previo >= sel->mils.interval){
+    if (digitalRead(SW1)==1 && digitalRead(SW2)==0 && sel->pos.ejeX < sel->limites.maxiX){
+      (sel->pos.ejeX) ++;
+
+      LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
+>>>>>>> Stashed changes
 
 <<<<<<< Updated upstream
 =======
@@ -657,6 +760,7 @@ void mover_nave_ejeX (const char tipo [], unsigned char ancho, unsigned char alt
   }
 }
 
+<<<<<<< Updated upstream
 
 //#define UP 0
 //#define DOWN 1
@@ -665,6 +769,10 @@ void mover_nave_ejeX (const char tipo [], unsigned char ancho, unsigned char alt
 
 //pude mover un PNC a cualquier direccion
 void move_NPC (const char tipo [], unsigned char ancho, unsigned char alto,  short pos_cons, short *pos_change, short mini, short maxi, unsigned long *PrevMillis, unsigned long interval, char direccion, char *flag){
+=======
+//pude mover un NPC a cualquier direccion
+void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion){
+>>>>>>> Stashed changes
   //chequea los millis para ell moviemiento, la velociad
   if (currentMillis - *PrevMillis >= interval){
     //permite elegir la dirccion a la que se movera el enmigo
@@ -728,6 +836,7 @@ void move_NPC (const char tipo [], unsigned char ancho, unsigned char alto,  sho
   }
 }
 
+<<<<<<< Updated upstream
 //permite controlar un objeto que este volando a traves de la pantalla, un disparo de las naves
 void disparo_volando (const char tipo [], char *active, char *hit, char ancho, char alto, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo){
   //de primero ve si el disparo esta activo y no haya golpeado algo
@@ -736,6 +845,27 @@ void disparo_volando (const char tipo [], char *active, char *hit, char ancho, c
     if (*posicionY < - (alto)){
       *active = 0;
       *hit = 0;
+=======
+
+void shoot_player (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
+  //generar el disparo
+  if (!digitalRead(SW1) && !digitalRead(SW2) && !(sel->info.active)){
+    sel->pos.ejeX = (sel_ref.pos.ejeX) + 6;
+    sel->pos.ejeY = (sel_ref.pos.ejeY) - (sel->dimension.alto);
+    sel->info.active = 1;
+    sel->info.hit = 0;
+  }
+}
+
+void disparo_volando (const unsigned char tipo [], struct entity *sel){
+  //disparo activo y no ha golpeado nada
+  if ((sel->info.active) && !(sel -> info.hit)){
+
+    //disparo activo y fuera de la pantalla
+    if (sel->pos.ejeY < -(sel->dimension.alto)) {
+      sel-> info.active = 0;
+      sel-> info.hit = 1;
+>>>>>>> Stashed changes
     }
 
     //el disparo esta dentro de la pantalla
@@ -753,6 +883,7 @@ void disparo_volando (const char tipo [], char *active, char *hit, char ancho, c
   }
 }
 
+<<<<<<< Updated upstream
 //estar atento a la condicion de disparo
 void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit){
   if (!digitalRead(SW1) && !digitalRead(SW2) && !(*active)){
@@ -760,6 +891,16 @@ void generar_disparo (short *posicionX, short *posicionY, short refX, short refY
     *posicionY = refY - 8;
     *active = 1;
     *hit = 0;
+=======
+void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
+  //generar el disparo con frecuencia
+  if ((currentMillis - (sel->mils.frecuencia) >= sel->mils.interval) && !(sel->info.active) && sel_ref.info.active){
+    sel-> mils.frecuencia = currentMillis;
+    sel-> pos.ejeX = sel_ref.pos.ejeX + 6;
+    sel-> pos.ejeY = sel_ref.pos.ejeY - (sel ->dimension.alto);
+    sel-> info.active = 1;
+    sel-> info.hit = 0;
+>>>>>>> Stashed changes
   }
 }
 
@@ -773,6 +914,7 @@ void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short 
   }
 }
 
+<<<<<<< Updated upstream
 
 //setup para la nave del jugador 1
 void P1_setup () {
@@ -794,12 +936,16 @@ void duos_setup () {
 }
 
 void boom (const char tipo [], short ejeX, short ejeY){
+=======
+void boom (const unsigned char tipo[], struct entity sel){
+>>>>>>> Stashed changes
   for (char i = 0; i < 5; i++){
     LCD_Sprite(ejeX-12, ejeY-10, 32, 32, tipo, 5, i, 0, 0);
     delay(20);
   }
 }
 
+<<<<<<< Updated upstream
 
 
 void hitbox1(void){
@@ -889,6 +1035,24 @@ void nivelSolo (int s){
 
 
 
+=======
+void setup_P1 () {
+  move_player (nave1, &shipP1);
+  shoot_player (bullet, shipP1, &bulletP1);
+  disparo_volando (bullet, &bulletP1);
+//  // ---------- vidas ----------
+//  vidasJ1(.vidas);
+//  // ---------- puntos ----------
+//  ScoreSoloMode(player.score);
+}
+
+
+void setup_P2() {
+  move_player (nave2, &shipP2);
+  shoot_player (bullet, shipP2, &bulletP2);
+  disparo_volando (bullet, &bulletP2);
+}
+>>>>>>> Stashed changes
 
 
 >>>>>>> Stashed changes
@@ -1178,7 +1342,11 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 //***************************************************************************************************************************************
 // Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
 //***************************************************************************************************************************************
+<<<<<<< Updated upstream
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, const char bitmap[]) {
+=======
+void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char bitmap[]) {
+>>>>>>> Stashed changes
   LCD_CMD(0x02c); // write_memory_start
   digitalWrite(LCD_RS, HIGH);
   digitalWrite(LCD_CS, LOW);
@@ -1204,8 +1372,12 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 // Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
 //***************************************************************************************************************************************
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 void LCD_Sprite(int x, int y, int width, int height, const char bitmap[], int columns, int index, char flip, char offset) {
+=======
+void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[], int columns, int index, char flip, char offset) {
+>>>>>>> Stashed changes
   LCD_CMD(0x02c); // write_memory_start
   digitalWrite(LCD_RS, HIGH);
   digitalWrite(LCD_CS, LOW);
