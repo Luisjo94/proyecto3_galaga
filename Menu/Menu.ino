@@ -160,7 +160,7 @@ void move_NPC2 (unsigned char tipo [], struct entity *sel, short mini, short max
 
 //disparo desde nave
 void shoot_player (unsigned char tipo[], struct entity sel_ref, struct entity *sel);
-void shoot_NPC (unsigned char tipo[], struct entity sel_ref, struct entity *sel);
+void shoot_NPC (unsigned char tipo[], struct entity sel_ref);
 void disparo_volando (unsigned char tipo [], struct entity *sel);
 
 //vidas y hitboxes
@@ -490,14 +490,14 @@ void move_player (const unsigned char tipo [], struct entity *sel){
 }
 
 //pude mover un NPC a cualquier direccion
-void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion){
+void move_NPC (unsigned char tipo [], struct entity *sel, char direccion){
   //chequea los millis para ell moviemiento, la velociad
   if (currentMillis - sel->mils.previo >= sel->mils.interval){
     //permite elegir la dirccion a la que se movera el enmigo
     switch (direccion) {
       case UP:
       //revisa que no haya llegado al limite y la bandera este apagada
-      if ((sel->pos.ejeY) > mini && !(sel->info.flag)){
+      if (((sel->pos.ejeY) > (sel->limites.miniY)) && !(sel->info.flag)){
         (sel->pos.ejeY) --;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
@@ -513,12 +513,12 @@ void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, sho
 
 
       case DOWN:
-      if ((sel->pos.ejeY) < maxi && !(sel->info.flag)){
+      if (((sel->pos.ejeY) < sel->limites.maxiY) && !(sel->info.flag)){
         (sel->pos.ejeY) ++;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) + (sel->dimension.alto) + 1, sel->dimension.ancho, 0x0);
-
+        
         sel->info.active = 1;
       }
       else {
@@ -527,12 +527,12 @@ void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, sho
       break;
 
       case LEFT:
-      if ((sel->pos.ejeX) > mini && !(sel->info.flag)){
+      if (((sel->pos.ejeX) > sel->limites.miniX) && !(sel->info.flag)){
         (sel->pos.ejeX) --;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
         V_line ((sel->pos.ejeX) + (sel->dimension.ancho) +1, sel->pos.ejeY, sel->dimension.alto, 0x0);
-
+      
         sel->info.active = 1;
       }
       else {
@@ -541,12 +541,12 @@ void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, sho
       break;
 
       case RIGHT:
-      if ((sel->pos.ejeX) < maxi && !(sel->info.flag)){
+      if (((sel->pos.ejeX) < (sel->limites.maxiX)) && !(sel->info.flag)){
         (sel->pos.ejeX) ++;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
         V_line ((sel->pos.ejeX) + (sel->dimension.ancho) +1, sel->pos.ejeY, sel->dimension.alto, 0x0);
-
+      
         sel->info.active = 1;
       }
       else {
