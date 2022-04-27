@@ -316,10 +316,13 @@ void loop() {
     case 6://ee
     if (start){
       LCD_Clear(0x00);
-      LCD_Bitmap (10, 10, 87, 100, malhit);
+      
       start = 0;
     }
-
+    for (int i=0; i<6; i++){
+      LCD_Sprite (0,0,120,110, ee, 6, i,0,0);
+      delay(10);
+    }
 
     break;
     default: //pantalla de incio
