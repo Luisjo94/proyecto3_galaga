@@ -12,7 +12,7 @@
     Integrantes: Nicolas Urioste (19907) y Luis José Archila (20403)
     IE3027: Electrónica Digital 2 - 2022
 
-    Se trabajó sobre la librería para el uso de pantalla ILI9341 previamente creada
+    Se trabajó sobre la librería para el uso de pantalla ILI9341 previamente creada por Pablo Mazariegos y José Morales
 */
 //***************************************************************************************************************************************
 #include <stdint.h>
@@ -108,6 +108,7 @@ struct entity bulletP2;
 //------------------- Estado del juego ----------------------
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 char start = 1; //bandera para cargar el menu
+char duos_flag = 0;
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -139,11 +140,8 @@ void FillRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, un
 void LCD_Print(String text, int x, int y, int fontSize, int color, int background);
 
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
-//void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
+void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset);
 
-
-
-extern uint8_t fondo[];
 
 //-------------------- prototipo de funciones --------------------------------------------
 //pantalla inicial y condiciones iniciales
@@ -164,7 +162,7 @@ void shoot_NPC (unsigned char tipo[], struct entity sel_ref);
 void disparo_volando (unsigned char tipo [], struct entity *sel);
 
 //vidas y hitboxes
-void vidasJI (struct entity *sel);
+void vidasJ1 (struct entity *sel);
 void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship);
 void boom (unsigned char tipo[], struct entity sel);
 
@@ -247,14 +245,25 @@ void loop() {
         if (start){
           SetupSolo ();
           start = 0;
-        }
 
+          //condiciones iniciales de los enemigos
+          shipNPC1.mils.interval = 20;
+        }
+        // ---------- movimiento y disparos----------
         setup_P1 ();
-//        // ---------- vidas ----------
-//        vidasJ1(P1.vidas);
-//
-//        // ---------- puntos ----------
-//        ScoreSoloMode(P1.score);
+
+        // ---------- vidas ----------
+        vidasJ1(&shipP1);
+
+        // ---------- puntos ----------
+        ScoreSoloMode(shipP1.player.score);
+
+        // ---------- enemigos ----------
+        spawn_ship(enemy1, &shipNPC1);
+        move_NPC(enemy1, &shipNPC1, RIGHT);
+        hitboxNPC(&shipNPC1, &bulletP1, &shipP1);
+
+
 //
 //        // ---------- movimiento y disparos nave 1----------
 //        P1_setup ();
@@ -288,46 +297,62 @@ void loop() {
 //      }
 //
       break;
-//***************************************************************************************************************************************
-// Función para dibujar una imagen sprite - los parámetros columns = número de imagenes en el sprite, index = cual desplegar, flip = darle vuelta
-//***************************************************************************************************************************************
-//void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[], int columns, int index, char flip, char offset)
+
+
       // ****************************** DUOS MODE ******************************
-//      case 2:
-//        if (start){
-//          P1.ejeX = 0;
-//          P2.ejeX = 303;
-//          SetupDuos (); //cambiar a duos despues
-//          start = 0;
-//        }
-//
-//        // ---------- vidas ----------
-//        vidasJ1(P1.vidas);
-//        vidasJ2(P2.vidas);
-//
-//        // ---------- puntos ----------
-//        ScoreDuosMode(P1.score, P2.score);
-//
-//        // ---------- movimiento y disparos ----------
-//        duos_setup();
-//        break;
+    case 2:
+        if (start){
+            SetupDuos (); //cambiar a duos despues
+            start = 0;
+            duos_flag = 1;
+            //posiciones iniciales en duos
+            shipP1.pos = {0,170};
+            shipP2.pos = {303,170};
+        }
+
+        // ---------- movimiento y disparos ----------
+        setup_P1();
+        setup_P2();
+
+        // ---------- vidas ----------
+        vidasJ1(&shipP1);
+        vidasJ2(&shipP2);
+
+        // ---------- puntos ----------
+        ScoreDuosMode(shipP1.player.score, shipP2.player.score);
+
+        // ---------- enemigos ----------
+        shipNPC1.pos = {0, 100};
+        move_NPC(enemy1, &shipNPC1, RIGHT);
+
+
+        break;
+
+
+    case 3:
+        if (!start){
+            GameOver();
+            start = 2;
+        }
+        break;
 
 
     case 6://ee
-    if (start){
-      LCD_Clear(0x00);
-      
-      start = 0;
-    }
-    for (int i=0; i<6; i++){
-      LCD_Sprite (0,0,120,110, ee, 6, i,0,0);
-      delay(10);
-    }
+        if (start){
+        LCD_Clear(0x00);
+        
+        start = 0;
+        }
+        for (int i=0; i<6; i++){
+        LCD_Sprite (100,70,120,110, ee, 6, i,0,0);
+        delay(150);
+        }
 
-    break;
-    default: //pantalla de incio
-      //nave para seleccionar jugadores
-      //escribir que el cartucho esta corrupto
+        break;
+
+
+    default: 
+        estado_juego = 0;
       break;
 
 
@@ -361,7 +386,7 @@ void SetupMenu (){
   shipP1.dimension = {15, 15};
   shipP1.pos = {155, 170};
   shipP1.mils = {0, 5};
-  shipP1.player = {0, 2};
+  shipP1.player = {0, 3};
   shipP1.limites = {0,304, 0, 250};
 
   shipP2 = shipP1;
@@ -374,6 +399,8 @@ void SetupMenu (){
   bulletP1.dimension = {8, 3};
   bulletP1.mils = {0, 2};
   bulletP1.info = {0,0,0};
+
+  bulletP2 = bulletP1;
 
   //aparecer la nave 1
   spawn_ship (nave1, &shipP1);
@@ -395,6 +422,10 @@ void SetupSolo () {
 // ********** nave J1 **********
   shipP1.pos = {155, 170};
   spawn_ship (nave1, &shipP1);
+// ********** enemigos **********
+shipNPC1.dimension = {15,15};
+shipNPC1.limites.maxiX = 303;
+shipNPC1.mils.interval = 5;
 }
 
 void SetupDuos (){
@@ -415,61 +446,71 @@ void SetupDuos (){
  LCD_Bitmap(282,210,15,15,nave2);
  LCD_Bitmap(299,210,15,15,nave2);
  // ********** naves J1 y J2 **********
-
+ shipP1.pos = {0, 170};
+ shipP2.pos = {303, 170};
+ spawn_ship (nave1, &shipP1);
+ spawn_ship (nave2, &shipP2);
+ 
  // ********** balas **********
 }
 
 void GameOver(void)
 {
   LCD_Clear(0x0);
-  LCD_Print("Game Over", 10, 10, 2, 0xFFFF, 0x0);
-}
-
-
-
-void vidasJI (struct entity *sel){
-  switch(sel->player.vidas){
-    case 2:
-    FillRect(39,210,15,15,0x0);
-    break;
-  case 1:
-    //LCD_Bitmap(5,210,15,15,nave1);
-    FillRect(22,210,15,15,0x0);
-    FillRect(39,210,15,15,0x0);
-    break;
-  case 0:
-    FillRect(2,210,15,15,0x0);
-    FillRect(22,210,15,15,0x0);
-    FillRect(39,210,15,15,0x0);
-    estado_juego = 3;
-    break;
+  LCD_Bitmap(10, 70, 293, 33, gameover);
+  if (duos_flag){
+      LCD_Print("Score Player 1:", 20, 130, 1, 0xFFFF, 0x0);
+      LCD_Print("Score Player 2:", 180, 130, 1, 0xFFFF, 0x0);
+      LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
+      LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
+  }
+  else{
+      LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
+      LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
   }
 }
 
-
-void vidasJ2(short j2)
-{
-  switch(j2)
-  {
+void vidasJ1 (struct entity *sel){
+  switch(sel->player.vidas){
+    case 3:
+        FillRect(39,210,15,15,0x0);
+        break;
     case 2:
-      //LCD_Bitmap(265,210,15,15,nave2);
-      //LCD_Bitmap(282,210,15,15,nave2);
-      FillRect(299,210,15,15,0x0);
+        FillRect(22,210,15,15,0x0);
+        FillRect(39,210,15,15,0x0);
+        break;
+    case 1:
+        FillRect(2,210,15,15,0x0);
+        FillRect(22,210,15,15,0x0);
+        FillRect(39,210,15,15,0x0);
+        break;
+    case 0:
+        estado_juego = 3;
+        break;
+  }
+}
+
+void vidasJ2(struct entity *sel)
+{
+  switch(sel->player.vidas)
+  {
+    case 3:
+      FillRect(265,210,15,15,0x0);
+      break;
+    case 2:
+      FillRect(282,210,15,15,0x0);
+      FillRect(265,210,15,15,0x0);
       break;
     case 1:
-      //LCD_Bitmap(265,210,15,15,nave2);
+      FillRect(265,210,15,15,0x0);
       FillRect(282,210,15,15,0x0);
       FillRect(299,210,15,15,0x0);
       break;
     case 0:
-      FillRect(265,210,15,15,0x0);
-      FillRect(282,210,15,15,0x0);
-      FillRect(299,210,15,15,0x0);
-      estado_juego = 3;
-      break;
+        estado_juego = 3;
+        break;
   }
 }
-
 
 void ScoreSoloMode(int scorej1)
 {
@@ -512,7 +553,7 @@ void move_player (const unsigned char tipo [], struct entity *sel){
 }
 
 //pude mover un NPC a cualquier direccion
-void move_NPC (unsigned char tipo [], struct entity *sel, char direccion){
+void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
   //chequea los millis para ell moviemiento, la velociad
   if (currentMillis - sel->mils.previo >= sel->mils.interval){
     //permite elegir la dirccion a la que se movera el enmigo
@@ -653,6 +694,12 @@ void setup_P1 () {
   move_player (nave1, &shipP1);
   shoot_player (bullet, shipP1, &bulletP1);
   disparo_volando (bullet, &bulletP1);
+}
+
+void setup_P2 () {
+  move_player (nave2, &shipP2);
+  shoot_player (bullet, shipP2, &bulletP2);
+  disparo_volando (bullet, &bulletP2);
 }
 
 
@@ -991,7 +1038,7 @@ void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[
   int k = 0;
   int ancho = ((width * columns));
   if (flip) {
-    for (int j = 0; j < height; j++) {
+    for (int j = 0; j < height; j++) {s
       k = (j * (ancho) + index * width - 1 - offset) * 2;
       k = k + width * 2;
       for (int i = 0; i < width; i++) {
@@ -1014,3 +1061,5 @@ void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[
   }
   digitalWrite(LCD_CS, HIGH);
 }
+
+//
