@@ -715,7 +715,10 @@ void ScoreDuosMode(int scorej1, int scorej2)
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 void spawn_ship (const unsigned char tipo [], struct entity *sel){
   LCD_Bitmap(sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
 }
@@ -772,6 +775,9 @@ void move_NPC (const char tipo [], unsigned char ancho, unsigned char alto,  sho
 =======
 //pude mover un NPC a cualquier direccion
 void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, short maxi, char direccion){
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   //chequea los millis para ell moviemiento, la velociad
   if (currentMillis - *PrevMillis >= interval){
@@ -837,6 +843,7 @@ void move_NPC2 (const unsigned char tipo [], struct entity *sel, short mini, sho
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //permite controlar un objeto que este volando a traves de la pantalla, un disparo de las naves
 void disparo_volando (const char tipo [], char *active, char *hit, char ancho, char alto, short posicionX, short *posicionY, unsigned long *previo, unsigned long intervalo){
   //de primero ve si el disparo esta activo y no haya golpeado algo
@@ -847,6 +854,8 @@ void disparo_volando (const char tipo [], char *active, char *hit, char ancho, c
       *hit = 0;
 =======
 
+=======
+>>>>>>> Stashed changes
 void shoot_player (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo
   if (!digitalRead(SW1) && !digitalRead(SW2) && !(sel->info.active)){
@@ -884,6 +893,7 @@ void disparo_volando (const unsigned char tipo [], struct entity *sel){
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //estar atento a la condicion de disparo
 void generar_disparo (short *posicionX, short *posicionY, short refX, short refY, char *active, char *hit){
   if (!digitalRead(SW1) && !digitalRead(SW2) && !(*active)){
@@ -892,6 +902,8 @@ void generar_disparo (short *posicionX, short *posicionY, short refX, short refY
     *active = 1;
     *hit = 0;
 =======
+=======
+>>>>>>> Stashed changes
 void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo con frecuencia
   if ((currentMillis - (sel->mils.frecuencia) >= sel->mils.interval) && !(sel->info.active) && sel_ref.info.active){
@@ -915,6 +927,17 @@ void generar_disparo_NPC (short *posicionX, short *posicionY, short refX, short 
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+void hitboxNPC(struct entity *NPC, struct entity *bala, struct entity *ship){
+  if (NPC->info.active && bala->info.active){
+    if (bala->pos.ejeY == ((NPC->pos.ejeY) - (NPC->dimension.alto))){
+      if ((bala->pos.ejeX) + (bala->dimension.ancho) <= ((NPC->pos.ejeX) + (NPC->dimension.ancho)) && (bala->pos.ejeX >= NPC->pos.ejeX)){
+        NPC->info.flag = 1;
+        NPC->info.active = 0;
+        bala->info.hit=1;
+        ship->player.score = (ship->player.score)+5;
+>>>>>>> Stashed changes
 
 //setup para la nave del jugador 1
 void P1_setup () {
@@ -935,7 +958,11 @@ void duos_setup () {
   generar_disparo (&bulletP2.ejeX, &bulletP2.ejeY, P2.ejeX, P2.ejeY, &bulletP2.active, &bulletP2.hit);
 }
 
+<<<<<<< Updated upstream
 void boom (const char tipo [], short ejeX, short ejeY){
+=======
+void boom (const unsigned char tipo[], struct entity sel){
+>>>>>>> Stashed changes
 =======
 void boom (const unsigned char tipo[], struct entity sel){
 >>>>>>> Stashed changes
@@ -1343,7 +1370,11 @@ void LCD_Print(String text, int x, int y, int fontSize, int color, int backgroun
 // Función para dibujar una imagen a partir de un arreglo de colores (Bitmap) Formato (Color 16bit R 5bits G 6bits B 5bits)
 //***************************************************************************************************************************************
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, const char bitmap[]) {
+=======
+void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char bitmap[]) {
+>>>>>>> Stashed changes
 =======
 void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char bitmap[]) {
 >>>>>>> Stashed changes
@@ -1373,8 +1404,12 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 //***************************************************************************************************************************************
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 void LCD_Sprite(int x, int y, int width, int height, const char bitmap[], int columns, int index, char flip, char offset) {
+=======
+void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[], int columns, int index, char flip, char offset) {
+>>>>>>> Stashed changes
 =======
 void LCD_Sprite(int x, int y, int width, int height, const unsigned char bitmap[], int columns, int index, char flip, char offset) {
 >>>>>>> Stashed changes
