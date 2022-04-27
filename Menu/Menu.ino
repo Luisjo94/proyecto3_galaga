@@ -229,7 +229,16 @@ void loop() {
           bulletP1.info.active = 0;
           start = 1;
         }
+        if (bulletP1.pos.ejeY <= 40) {
+          if (bulletP1.info.active){
+            estado_juego = 6;
+            bulletP1.info.hit = 1;
+            bulletP1.info.active = 0;
+            start = 1;
+          }
+        }
       }
+      
       break;
 
       // ****************************** SOLO MODE ******************************
@@ -303,6 +312,16 @@ void loop() {
 //        duos_setup();
 //        break;
 
+
+    case 6://ee
+    if (start){
+      LCD_Clear(0x00);
+      LCD_Bitmap (10, 10, 87, 100, malhit);
+      start = 0;
+    }
+
+
+    break;
     default: //pantalla de incio
       //nave para seleccionar jugadores
       //escribir que el cartucho esta corrupto
