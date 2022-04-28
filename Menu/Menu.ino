@@ -133,7 +133,6 @@ struct entity NPCbullet9;
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 char start = 1; //bandera para cargar el menu
 char duos_flag = 0;
-int score;
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -198,6 +197,7 @@ void setup_nivel1 (void);
 //viejas funciones
 
 
+short score;
 
 
 //-------------------- tiempo -------------------------------------
@@ -334,8 +334,16 @@ void loop() {
 
         // ---------- puntos ----------
         ScoreDuosMode(shipP1.player.score, shipP2.player.score);
+<<<<<<< Updated upstream
         
         
+=======
+
+        
+
+        // ---------- generacion de enemigos ----------
+        // ---------- niveles ----------
+>>>>>>> Stashed changes
         score = shipP1.player.score + shipP2.player.score;
 
 
@@ -343,14 +351,36 @@ void loop() {
         if ((score>=0) && (score<10))
         {
           nivel1Solo();
+          
+          hitboxPlayer (&shipP2, &NPCbullet1);
+          hitboxPlayer (&shipP2, &NPCbullet2);
+
+          hitboxNPC(&shipNPC1, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC2, &bulletP2, &shipP2);
         }
         else if ((score>=10) && (score<25))
         {
           nivel2Solo();
+          hitboxPlayer (&shipP2, &NPCbullet3);
+          hitboxPlayer (&shipP2, &NPCbullet4);
+          hitboxPlayer (&shipP2, &NPCbullet5);
+
+          hitboxNPC(&shipNPC3, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC4, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC5, &bulletP2, &shipP2);
         }
         else if ((score>=25) && (score<45))
         {
           nivel3Solo();
+          hitboxPlayer (&shipP2, &NPCbullet6);
+          hitboxPlayer (&shipP2, &NPCbullet7);
+          hitboxPlayer (&shipP2, &NPCbullet8);
+          hitboxPlayer (&shipP2, &NPCbullet9);
+
+          hitboxNPC(&shipNPC6, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC7, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC8, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC9, &bulletP2, &shipP2);
         }
         else 
         {
@@ -546,8 +576,13 @@ void SetupDuos (){
  spawn_ship (nave1, &shipP1);
  spawn_ship (nave2, &shipP2);
 
+<<<<<<< Updated upstream
  // ********** balas **********
  // ********** enemigos **********
+=======
+ 
+// ********** enemigos **********
+>>>>>>> Stashed changes
   shipNPC1.dimension = {15,15};
   shipNPC1.limites.maxiX = 303;
   shipNPC1.mils.interval = 5;
@@ -614,8 +649,8 @@ void GameOver(void)
 void Winner(void)
 {
   LCD_Clear(0x0);
-  LCD_Bitmap(144, 50, 32, 32, win);
   LCD_Print("Congratulations!", 30, 100, 2, 0xFFFF, 0x0);
+<<<<<<< Updated upstream
   if (!duos_flag){
     LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
     LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
@@ -627,6 +662,10 @@ void Winner(void)
     LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
   }
   
+=======
+  LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
+  LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+>>>>>>> Stashed changes
 }
 
 void vidasJ1 (struct entity *sel){
@@ -927,10 +966,6 @@ void nivel1Solo () {
   hitboxPlayer(&shipP1, &NPCbullet1);
   hitboxPlayer(&shipP1, &NPCbullet2);
 
-  // ---------- nave 2 ----------
-  hitboxPlayer(&shipP2, &NPCbullet1);
-  hitboxPlayer(&shipP2, &NPCbullet2);
-
   // ---------- enemigo 1 ----------
   // up, down, left, right
   if ((shipNPC1.info.flag == 0) || (shipNPC1.info.flag == 3))
@@ -967,11 +1002,6 @@ void nivel2Solo () {
   hitboxPlayer(&shipP1, &NPCbullet3);
   hitboxPlayer(&shipP1, &NPCbullet4);
   hitboxPlayer(&shipP1, &NPCbullet5);
-
-  // ---------- nave 2 ----------
-  hitboxPlayer(&shipP2, &NPCbullet3);
-  hitboxPlayer(&shipP2, &NPCbullet4);
-  hitboxPlayer(&shipP2, &NPCbullet5);
 
   // ---------- enemigo 3 ----------
   // up, down, left, right
@@ -1027,12 +1057,6 @@ void nivel3Solo () {
   hitboxPlayer(&shipP1, &NPCbullet7);
   hitboxPlayer(&shipP1, &NPCbullet8);
   hitboxPlayer(&shipP1, &NPCbullet9);
-
-  // ---------- nave 2 ----------
-  hitboxPlayer(&shipP2, &NPCbullet6);
-  hitboxPlayer(&shipP2, &NPCbullet7);
-  hitboxPlayer(&shipP2, &NPCbullet8);
-  hitboxPlayer(&shipP2, &NPCbullet9);
 
   // ---------- enemigo 6 ----------
   // up, down, left, right
