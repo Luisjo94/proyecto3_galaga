@@ -247,37 +247,37 @@ void loop() {
       //derecha de jugador 1
       if (lectura == 'D'){
         shipP1.actions = {0,0,0};
-        shipP2.actions = shipP1.actions;
+        //shipP2.actions = shipP1.actions;
         shipP1.actions.der = 1;
       }
 
       if (lectura == 'A'){
         shipP1.actions = {0,0,0};
-        shipP2.actions = shipP1.actions;
+        //shipP2.actions = shipP1.actions;
         shipP1.actions.izq = 1;
       }
 
       if (lectura == 'S'){
         shipP1.actions = {0,0,0};
-        shipP2.actions = shipP1.actions;
+        //shipP2.actions = shipP1.actions;
         shipP1.actions.disp = 1;
       }
 
       if (lectura == 'Z'){
-        shipP1.actions = {0,0,0};
-        shipP2.actions = shipP1.actions;
+        shipP2.actions = {0,0,0};
+        //shipP2.actions = shipP1.actions;
         shipP2.actions.der = 1;
       }
 
       if (lectura == 'C'){
-        shipP1.actions = {0,0,0};
-        shipP2.actions = shipP1.actions;
+        shipP2.actions = {0,0,0};
+        //shipP2.actions = shipP1.actions;
         shipP2.actions.izq = 1;
       }
 
       if (lectura == 'X'){
-        shipP1.actions = {0,0,0};
-        shipP2.actions = shipP1.actions;
+        shipP2.actions = {0,0,0};
+        //shipP2.actions = shipP1.actions;
         shipP2.actions.disp = 1;
       }
   }
@@ -695,6 +695,8 @@ void move_player (const unsigned char tipo [], struct entity *sel){
 
       V_line ((sel->pos.ejeX) - 1, sel->pos.ejeY, sel->dimension.ancho, 0x0);
       V_line ((sel->pos.ejeX) +1 + (sel->dimension.ancho), sel->pos.ejeY, sel->dimension.ancho, 0x0);
+
+      //sel->actions.der = 0;
     }
 
     //if (digitalRead(SW1)==0 && digitalRead(SW2)==1 && sel->pos.ejeX > sel->limites.miniX){
@@ -706,6 +708,9 @@ void move_player (const unsigned char tipo [], struct entity *sel){
 
       V_line ((sel->pos.ejeX) - 1, sel->pos.ejeY, sel->dimension.ancho, 0x0);
       V_line ((sel->pos.ejeX) +1 + (sel->dimension.ancho), sel->pos.ejeY, sel->dimension.ancho, 0x0);
+
+      //sel->actions.izq = 0;
+
     }
     sel->mils.previo = currentMillis;
   }
@@ -784,14 +789,16 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
   }
 }
 
-void shoot_player (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
+void shoot_player (const unsigned char tipo[], struct entity *sel_ref, struct entity *sel){
   //generar el disparo
-  if (!digitalRead(SW1) && !digitalRead(SW2) && !(sel->info.active)){
+  if ((sel_ref->actions.disp == 1) && !(sel->info.active)){
     Serial2.print('u');
-    sel->pos.ejeX = (sel_ref.pos.ejeX) + 6;
-    sel->pos.ejeY = (sel_ref.pos.ejeY) - (sel->dimension.alto);
+    sel->pos.ejeX = (sel_ref->pos.ejeX) + 6;
+    sel->pos.ejeY = (sel_ref->pos.ejeY) - (sel->dimension.alto);
     sel->info.active = 1;
     sel->info.hit = 0;
+
+    sel_ref->actions.disp = 0;
   }
 }
 
@@ -881,7 +888,7 @@ void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity
 
 
 void hitboxPlayer (struct entity *tetano, struct entity *bala){
-  if (bala->pos.ejeY >= ((tetano->pos.ejeY) - (tetano->dimension.alto)) && bala->pos.ejeY+8 < tetano->pos.ejeY){
+  if (bala->pos.ejeY >= ((tetano->pos.ejeY) - (tetano->dimension.alto)) && bala->pos.ejeY+8 <= tetano->pos.ejeY){
     if (((bala->pos.ejeX) + (bala->dimension.ancho) <= ((tetano->pos.ejeX) + (tetano->dimension.ancho))) && (bala->pos.ejeX >= tetano->pos.ejeX)){
       (tetano->player.vidas)--;
       bala->info.hit=1;
@@ -902,14 +909,14 @@ void boom (const unsigned char tipo[], struct entity sel){
 
 void setup_P1 () {
   move_player (nave1, &shipP1);
-  shoot_player (bullet, shipP1, &bulletP1);
+  shoot_player (bullet, &shipP1, &bulletP1);
   disparo_volando (bullet, &bulletP1);
   //hitboxPlayer(&shipP1, &NPCbullet1);
 }
 
 void setup_P2 () {
   move_player (nave2, &shipP2);
-  shoot_player (bullet, shipP2, &bulletP2);
+  shoot_player (bullet, &shipP2, &bulletP2);
   disparo_volando (bullet, &bulletP2);
   
 }
