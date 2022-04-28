@@ -141,6 +141,7 @@ unsigned char lectura;
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 char start = 1; //bandera para cargar el menu
 char duos_flag = 0;
+int score;
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -388,13 +389,28 @@ void loop() {
         // ---------- puntos ----------
         ScoreDuosMode(shipP1.player.score, shipP2.player.score);
 
-        // ---------- generacion de enemigos ----------
-        /*
-        while (shipP1.player.vidas>0 && shipP2.player.vidas>0)
+        score = shipP1.player.score + shipP2.player.score;
+
+
+       // ---------- niveles ----------
+        if ((score>=0) && (score<10))
         {
-          /* code 
+          nivel1Solo();
         }
-        */
+        else if ((score>=10) && (score<25))
+        {
+          nivel2Solo();
+        }
+        else if ((score>=25) && (score<45))
+        {
+          nivel3Solo();
+        }
+        else 
+        {
+          estado_juego = 4;
+        }
+
+        break;
 
 
         break;
@@ -612,24 +628,40 @@ void GameOver(void)
 void Winner(void)
 {
   LCD_Clear(0x0);
+  LCD_Bitmap(144, 50, 32, 32, win);
   LCD_Print("Congratulations!", 30, 100, 2, 0xFFFF, 0x0);
-  LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
-  LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+  if (!duos_flag){
+    LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
+    LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+  }
+  else{
+    LCD_Print("Score Player 1:", 20, 130, 1, 0xFFFF, 0x0);
+    LCD_Print("Score Player 2:", 180, 130, 1, 0xFFFF, 0x0);
+    LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
+    LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
+  }
+  
 }
 
 void vidasJ1 (struct entity *sel){
   switch(sel->player.vidas){
     case 3:
         FillRect(39,210,15,15,0x0);
+        boom(explosion_ship, shipP1);
+        H_line(0, 191, 319, 0xFFFF);
         break;
     case 2:
         FillRect(22,210,15,15,0x0);
         FillRect(39,210,15,15,0x0);
+        boom(explosion_ship, shipP1);
+        H_line(0, 191, 319, 0xFFFF);
         break;
     case 1:
         FillRect(5,210,15,15,0x0);
         FillRect(22,210,15,15,0x0);
         FillRect(39,210,15,15,0x0);
+        boom(explosion_ship, shipP1);
+        H_line(0, 191, 319, 0xFFFF);
         break;
     case 0:
         boom(explosion_ship, shipP1);
@@ -645,20 +677,25 @@ void vidasJ2(struct entity *sel)
   {
     case 3:
       FillRect(265,210,15,15,0x0);
+      boom(explosion_ship, shipP2);
+      H_line(0, 191, 319, 0xFFFF);
       break;
     case 2:
       FillRect(282,210,15,15,0x0);
       FillRect(265,210,15,15,0x0);
+      boom(explosion_ship, shipP2);
+      H_line(0, 191, 319, 0xFFFF);
       break;
     case 1:
       FillRect(265,210,15,15,0x0);
       FillRect(282,210,15,15,0x0);
       FillRect(299,210,15,15,0x0);
+      boom(explosion_ship, shipP2);
+      H_line(0, 191, 319, 0xFFFF);
       break;
     case 0:
-      boom(explosion_ship, shipP1);
+      boom(explosion_ship, shipP2);
       H_line(0, 191, 319, 0xFFFF);
-      estado_juego = 3;
       estado_juego = 3;
       break;
     }
@@ -928,6 +965,10 @@ void nivel1Solo () {
   hitboxPlayer(&shipP1, &NPCbullet1);
   hitboxPlayer(&shipP1, &NPCbullet2);
 
+  // ---------- nave 2 ----------
+  hitboxPlayer(&shipP2, &NPCbullet1);
+  hitboxPlayer(&shipP2, &NPCbullet2);
+
   // ---------- enemigo 1 ----------
   // up, down, left, right
   if ((shipNPC1.info.flag == 0) || (shipNPC1.info.flag == 3))
@@ -964,6 +1005,11 @@ void nivel2Solo () {
   hitboxPlayer(&shipP1, &NPCbullet3);
   hitboxPlayer(&shipP1, &NPCbullet4);
   hitboxPlayer(&shipP1, &NPCbullet5);
+
+  // ---------- nave 2 ----------
+  hitboxPlayer(&shipP2, &NPCbullet3);
+  hitboxPlayer(&shipP2, &NPCbullet4);
+  hitboxPlayer(&shipP2, &NPCbullet5);
 
   // ---------- enemigo 3 ----------
   // up, down, left, right
@@ -1019,6 +1065,12 @@ void nivel3Solo () {
   hitboxPlayer(&shipP1, &NPCbullet7);
   hitboxPlayer(&shipP1, &NPCbullet8);
   hitboxPlayer(&shipP1, &NPCbullet9);
+
+  // ---------- nave 2 ----------
+  hitboxPlayer(&shipP2, &NPCbullet6);
+  hitboxPlayer(&shipP2, &NPCbullet7);
+  hitboxPlayer(&shipP2, &NPCbullet8);
+  hitboxPlayer(&shipP2, &NPCbullet9);
 
   // ---------- enemigo 6 ----------
   // up, down, left, right
