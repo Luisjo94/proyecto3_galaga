@@ -7,9 +7,13 @@
     is not the creative property of the author. This code simply
     plays a Piezo buzzer rendition of the song.
 */
-
+#include "galaga_intro.h"
 #include "musica_ee.h"
-#define piezo PD7
+#include "disparo.h"
+#include "death.h"
+#include "expo.h"
+
+int piezo = PD7;
 
 void play (void);
 
@@ -23,21 +27,73 @@ char a = 4;
 char b = 0;
 
 
-char RickRoll = 'r';
+char active = 8;
+
+char incoming = 0;
+
+
 
 void setup()
 {
   pinMode(piezo, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
 
 }
 
 void loop()
 {
   // play next step in song
-  Serial.print(Serial.read());
-  if (Serial.read() == RickRoll){
-    play ();
+  while(Serial.available()>0){
+    incoming = Serial.read();
+      if (incoming == 'r'){
+        active = 0;
+      } //rick roll
+
+      if (incoming == 't'){
+        active = 1;
+      } //musica de inicio
+
+      if (incoming == 'y'){
+        active = 2;
+      } //game over
+
+      if (incoming == 'u'){
+        active = 3;
+      } //disparo
+
+      if (incoming == 'i'){
+        active = 4;
+      } //explocion
+  }
+
+  switch (active){
+    case 0:
+    play();
+    break;
+
+    case 1:
+    intro(piezo);
+    active = 8;
+    break;
+
+    case 2:
+    game_over(piezo);
+    active = 8;
+    break;
+
+    case 3:
+    shoot (piezo);
+    active = 8;
+    break;
+
+    case 4:
+    explocion (piezo);
+    active = 8;
+    break;
+    
+    default:
+    active = 8;
+    break;
   }
 }
 
@@ -103,6 +159,7 @@ void play() {
   //finalizacion dela cancion
   if (a == 7) { // loop back around to beginning of song
     a = 1;
+    active = 8;
   }
 }
   
