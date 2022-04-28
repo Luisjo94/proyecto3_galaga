@@ -273,46 +273,19 @@ void loop() {
         // ---------- puntos ----------
         ScoreSoloMode(shipP1.player.score);
 
+<<<<<<< Updated upstream
         // ---------- enemigos ----------
         move_NPC(enemy1, &shipNPC1, RIGHT);
         shoot_NPC(bulletE, shipNPC1, &NPCbullet1, 15);
         disparo_volando(bulletE, &NPCbullet1);
         hitboxNPC(&shipNPC1, &bulletP1, &shipP1);
+=======
+        nivel1Solo();
+
+>>>>>>> Stashed changes
 
 
 
-//
-//        // ---------- movimiento y disparos nave 1----------
-//        P1_setup ();
-//
-//        // ---------- movimiento y disparos enemy1----------
-//        if (bad1.flag == 0){
-//          move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, RIGHT, &bad1.flag);
-//        }
-//
-//          //move_NPC(enemy1, bad1.ancho, bad1.alto, bad1.ejeY, &bad1.ejeX, enemy.xMin, enemy.xMax, &bad1.previo, bad1.intervalo, LEFT, &bad1.flag);
-//
-//
-//        //hitbox menu
-//      if (bulletP1.ejeY == bad1.ejeY+15){
-//        if (bulletP1.ejeX <= bad1.ejeX + bad1.ancho && bulletP1.ejeX >= bad1.ejeX && bulletP1.active){
-//          P1.score = P1.score+5;
-//          bulletP1.hit = 1;
-//          bulletP1.active = 0;
-//          bad1.flag = 1;
-//
-//          boom (explosion_bad, bad1.ejeX, bad1.ejeY);
-//
-//          for (char i = 0; i < 5; i++)
-//          {
-//            LCD_Sprite(bad1.ejeX-12, bad1.ejeY-10, 32, 32, explosion_bad, 5, i, 0, 0);
-//            delay(20);
-//          }
-//          bad1.ejeX = -15;
-//
-//        }
-//      }
-//
       break;
 
 
@@ -587,7 +560,7 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
     switch (direccion) {
       case UP:
       //revisa que no haya llegado al limite y la bandera este apagada
-      if (((sel->pos.ejeY) > (sel->limites.miniY)) && !(sel->info.flag)){
+      if (((sel->pos.ejeY) > (sel->limites.miniY)) && (sel->info.flag)!=1){
         (sel->pos.ejeY) --;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
@@ -603,7 +576,7 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
 
 
       case DOWN:
-      if (((sel->pos.ejeY) < sel->limites.maxiY) && !(sel->info.flag)){
+      if (((sel->pos.ejeY) < sel->limites.maxiY) && (sel->info.flag)!=2){
         (sel->pos.ejeY) ++;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         H_line (sel->pos.ejeX, (sel->pos.ejeY) -1, sel->dimension.ancho, 0x0);
@@ -617,7 +590,7 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
       break;
 
       case LEFT:
-      if (((sel->pos.ejeX) > sel->limites.miniX) && !(sel->info.flag)){
+      if (((sel->pos.ejeX) > sel->limites.miniX) && (sel->info.flag)!=3){
         (sel->pos.ejeX) --;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
@@ -631,7 +604,7 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
       break;
 
       case RIGHT:
-      if (((sel->pos.ejeX) < (sel->limites.maxiX)) && !(sel->info.flag)){
+      if (((sel->pos.ejeX) < (sel->limites.maxiX)) && (sel->info.flag)!=4){
         (sel->pos.ejeX) ++;
         LCD_Bitmap (sel->pos.ejeX, sel->pos.ejeY, sel->dimension.ancho, sel->dimension.alto, tipo);
         V_line ((sel->pos.ejeX) -1, sel->pos.ejeY, sel->dimension.alto, 0x0);
@@ -736,12 +709,19 @@ void disparo_volando (const unsigned char tipo [], struct entity *sel){
 
 
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
 
 
 
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity *sel, unsigned short tiempo){
   //generar el disparo con frecuencia
   if ((currentMillis - (sel->mils.frecuencia) >= sel->mils.interval) && !(sel->info.active) && sel_ref.info.active){
@@ -771,8 +751,14 @@ void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity
   }
 }
 
+<<<<<<< Updated upstream
 void hitboxPlayer (struct entity *tetano, struct entity *bala){
   if (bala->pos.ejeY >= ((tetano->pos.ejeY) - (tetano->dimension.alto))){
+=======
+
+void hitboxPlayer (struct entity *tetano, struct entity *bala){
+  if (bala->pos.ejeY <= ((tetano->pos.ejeY) - (tetano->dimension.alto)) && bala->pos.ejeY >= tetano->pos.ejeY){
+>>>>>>> Stashed changes
     if (((bala->pos.ejeX) + (bala->dimension.ancho) <= ((tetano->pos.ejeX) + (tetano->dimension.ancho))) && (bala->pos.ejeX >= tetano->pos.ejeX)){
       (tetano->player.vidas)--;
       bala->info.hit=1;
@@ -804,7 +790,35 @@ void setup_P2 () {
 
 
 
-
+void nivel1Solo () {
+  // up, down, left, right
+  // ---------- enemigos ----------
+  if ((shipNPC1.info.flag == 0) || (shipNPC1.info.flag == 3))
+  {
+    move_NPC(enemy1, &shipNPC1, RIGHT);
+  }
+  if (shipNPC1.info.flag == 4)
+  {
+    move_NPC(enemy1, &shipNPC1, LEFT);
+  }
+  /*
+  else if (shipNPC1.info.flag == 1)
+  {
+    move_NPC(enemy1, &shipNPC1, LEFT);
+  }
+  else if (shipNPC1.info.flag == 3)
+  {
+    move_NPC(enemy1, &shipNPC1, DOWN);
+  }
+  else if (shipNPC1.info.flag == 4)
+  {
+    move_NPC(enemy1, &shipNPC1, UP);
+  }
+  */
+  shoot_NPC(bulletE, shipNPC1, &NPCbullet1, 15);
+  disparo_volando(bulletE, &NPCbullet1);
+  hitboxNPC(&shipNPC1, &bulletP1, &shipP1);
+}
 
 
 
