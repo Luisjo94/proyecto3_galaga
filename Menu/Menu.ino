@@ -19,6 +19,11 @@
 #include <stdbool.h>
 #include <TM4C123GH6PM.h>
 
+#include <SPI.h>
+#include <SD.h>
+
+File ScoreSolo;
+File ScoreDuos;
 
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -222,6 +227,15 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x00);
+
+  Serial.print("Initializing SD card...");
+  pinMode(10, OUTPUT);
+
+  if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done.");
 
   start = 1;
 
@@ -617,11 +631,42 @@ void GameOver(void)
       LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
       Serial2.print('y');
+
+      ScoreDuos = SD.open("ScoreDuos.txt", FILE_WRITE);
+      
+      if (ScoreDuos) {
+      Serial.print("Writing to ScoreDuos.txt...");
+      ScoreDuos.print("Score Player 1: ");
+      ScoreDuos.println(String(shipP1.player.score));
+      ScoreDuos.print("Score Player 2: ");
+      ScoreDuos.println(String(shipP2.player.score));
+      // close the file:
+      ScoreDuos.close();
+      Serial.println("done.");
+      } else {
+      // if the file didn't open, print an error:
+      Serial.println("error opening ScoreDuos.txt");
+      }
+      
   }
   else{
       LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
       Serial2.print('y');
+
+      ScoreSolo = SD.open("ScoreSolo.txt", FILE_WRITE);
+      
+      if (ScoreSolo) {
+      Serial.print("Writing to ScoreDuos.txt...");
+      ScoreDuos.print("Score Player 1: ");
+      ScoreDuos.println(String(shipP1.player.score));
+      // close the file:
+      ScoreSolo.close();
+      Serial.println("done.");
+      } else {
+      // if the file didn't open, print an error:
+      Serial.println("error opening ScoreSolo.txt");
+      }
   }
 }
 
@@ -633,12 +678,42 @@ void Winner(void)
   if (!duos_flag){
     LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
     LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+
+    ScoreSolo = SD.open("ScoreSolo.txt", FILE_WRITE);
+      
+    if (ScoreSolo) {
+    Serial.print("Writing to ScoreDuos.txt...");
+    ScoreDuos.print("Score Player 1: ");
+    ScoreDuos.println(String(shipP1.player.score));
+    // close the file:
+    ScoreSolo.close();
+    Serial.println("done.");
+    } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening ScoreSolo.txt");
+    }
   }
   else{
     LCD_Print("Score Player 1:", 20, 130, 1, 0xFFFF, 0x0);
     LCD_Print("Score Player 2:", 180, 130, 1, 0xFFFF, 0x0);
     LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
     LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
+
+    ScoreDuos = SD.open("ScoreDuos.txt", FILE_WRITE);
+      
+      if (ScoreDuos) {
+      Serial.print("Writing to ScoreDuos.txt...");
+      ScoreDuos.print("Score Player 1: ");
+      ScoreDuos.println(String(shipP1.player.score));
+      ScoreDuos.print("Score Player 2: ");
+      ScoreDuos.println(String(shipP2.player.score));
+      // close the file:
+      ScoreDuos.close();
+      Serial.println("done.");
+      } else {
+      // if the file didn't open, print an error:
+      Serial.println("error opening ScoreDuos.txt");
+      }
   }
   
 }
