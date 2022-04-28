@@ -19,11 +19,6 @@
 #include <stdbool.h>
 #include <TM4C123GH6PM.h>
 
-#include <SPI.h>
-#include <SD.h>
-
-File ScoreSolo;
-File ScoreDuos;
 
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -146,7 +141,6 @@ unsigned char lectura;
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 char start = 1; //bandera para cargar el menu
 char duos_flag = 0;
-int score;
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -211,6 +205,7 @@ void setup_nivel1 (void);
 //viejas funciones
 
 
+short score;
 
 
 //-------------------- tiempo -------------------------------------
@@ -227,15 +222,6 @@ void setup() {
   Serial.println("Inicio");
   LCD_Init();
   LCD_Clear(0x00);
-
-  Serial.print("Initializing SD card...");
-  pinMode(10, OUTPUT);
-
-  if (!SD.begin(4)) {
-    Serial.println("initialization failed!");
-    return;
-  }
-  Serial.println("initialization done.");
 
   start = 1;
 
@@ -403,6 +389,10 @@ void loop() {
         // ---------- puntos ----------
         ScoreDuosMode(shipP1.player.score, shipP2.player.score);
 
+        
+
+        // ---------- generacion de enemigos ----------
+        // ---------- niveles ----------
         score = shipP1.player.score + shipP2.player.score;
 
 
@@ -410,22 +400,41 @@ void loop() {
         if ((score>=0) && (score<10))
         {
           nivel1Solo();
+          
+          hitboxPlayer (&shipP2, &NPCbullet1);
+          hitboxPlayer (&shipP2, &NPCbullet2);
+
+          hitboxNPC(&shipNPC1, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC2, &bulletP2, &shipP2);
         }
         else if ((score>=10) && (score<25))
         {
           nivel2Solo();
+          hitboxPlayer (&shipP2, &NPCbullet3);
+          hitboxPlayer (&shipP2, &NPCbullet4);
+          hitboxPlayer (&shipP2, &NPCbullet5);
+
+          hitboxNPC(&shipNPC3, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC4, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC5, &bulletP2, &shipP2);
         }
         else if ((score>=25) && (score<45))
         {
           nivel3Solo();
+          hitboxPlayer (&shipP2, &NPCbullet6);
+          hitboxPlayer (&shipP2, &NPCbullet7);
+          hitboxPlayer (&shipP2, &NPCbullet8);
+          hitboxPlayer (&shipP2, &NPCbullet9);
+
+          hitboxNPC(&shipNPC6, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC7, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC8, &bulletP2, &shipP2);
+          hitboxNPC(&shipNPC9, &bulletP2, &shipP2);
         }
         else 
         {
           estado_juego = 4;
         }
-
-        break;
-
 
         break;
 
@@ -448,7 +457,7 @@ void loop() {
     case 6://ee
         if (start){
         LCD_Clear(0x00);
-
+//solo
         start = 0;
         Serial2.print('r');
         }
@@ -618,7 +627,51 @@ void SetupDuos (){
  spawn_ship (nave1, &shipP1);
  spawn_ship (nave2, &shipP2);
 
- // ********** balas **********
+ 
+// ********** enemigos **********
+  shipNPC1.dimension = {15,15};
+  shipNPC1.limites.maxiX = 303;
+  shipNPC1.mils.interval = 5;
+
+  shipNPC2.pos = {303, 50};
+  shipNPC2.dimension = {15,15};
+  shipNPC2.limites.maxiX = 303;
+  shipNPC2.mils.interval = 10;
+
+  shipNPC3.pos = {303, 30};
+  shipNPC3.dimension = {15,15};
+  shipNPC3.limites.maxiX = 303;
+  shipNPC3.mils.interval = 15;
+
+  shipNPC4.pos = {0, 70};
+  shipNPC4.dimension = {15,15};
+  shipNPC4.limites.maxiX = 303;
+  shipNPC4.mils.interval = 15;
+
+  shipNPC5.pos = {303, 110};
+  shipNPC5.dimension = {15,15};
+  shipNPC5.limites.maxiX = 303;
+  shipNPC5.mils.interval = 15;
+
+  shipNPC6.pos = {303, 30};
+  shipNPC6.dimension = {15,15};
+  shipNPC6.limites.maxiX = 303;
+  shipNPC6.mils.interval = 15;
+
+  shipNPC7.pos = {0, 60};
+  shipNPC7.dimension = {15,15};
+  shipNPC7.limites.maxiX = 303;
+  shipNPC7.mils.interval = 5;
+
+  shipNPC8.pos = {303, 90};
+  shipNPC8.dimension = {15,15};
+  shipNPC8.limites.maxiX = 303;
+  shipNPC8.mils.interval = 5;
+
+  shipNPC9.pos = {0, 120};
+  shipNPC9.dimension = {15,15};
+  shipNPC9.limites.maxiX = 303;
+  shipNPC9.mils.interval = 5;
 }
 
 void GameOver(void)
@@ -631,112 +684,35 @@ void GameOver(void)
       LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
       Serial2.print('y');
-
-      ScoreDuos = SD.open("ScoreDuos.txt", FILE_WRITE);
-      
-      if (ScoreDuos) {
-      Serial.print("Writing to ScoreDuos.txt...");
-      ScoreDuos.print("Score Player 1: ");
-      ScoreDuos.println(String(shipP1.player.score));
-      ScoreDuos.print("Score Player 2: ");
-      ScoreDuos.println(String(shipP2.player.score));
-      // close the file:
-      ScoreDuos.close();
-      Serial.println("done.");
-      } else {
-      // if the file didn't open, print an error:
-      Serial.println("error opening ScoreDuos.txt");
-      }
-      
   }
   else{
       LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
       Serial2.print('y');
-
-      ScoreSolo = SD.open("ScoreSolo.txt", FILE_WRITE);
-      
-      if (ScoreSolo) {
-      Serial.print("Writing to ScoreDuos.txt...");
-      ScoreDuos.print("Score Player 1: ");
-      ScoreDuos.println(String(shipP1.player.score));
-      // close the file:
-      ScoreSolo.close();
-      Serial.println("done.");
-      } else {
-      // if the file didn't open, print an error:
-      Serial.println("error opening ScoreSolo.txt");
-      }
   }
 }
 
 void Winner(void)
 {
   LCD_Clear(0x0);
-  LCD_Bitmap(144, 50, 32, 32, win);
   LCD_Print("Congratulations!", 30, 100, 2, 0xFFFF, 0x0);
-  if (!duos_flag){
-    LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
-    LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
-
-    ScoreSolo = SD.open("ScoreSolo.txt", FILE_WRITE);
-      
-    if (ScoreSolo) {
-    Serial.print("Writing to ScoreDuos.txt...");
-    ScoreDuos.print("Score Player 1: ");
-    ScoreDuos.println(String(shipP1.player.score));
-    // close the file:
-    ScoreSolo.close();
-    Serial.println("done.");
-    } else {
-    // if the file didn't open, print an error:
-    Serial.println("error opening ScoreSolo.txt");
-    }
-  }
-  else{
-    LCD_Print("Score Player 1:", 20, 130, 1, 0xFFFF, 0x0);
-    LCD_Print("Score Player 2:", 180, 130, 1, 0xFFFF, 0x0);
-    LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
-    LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
-
-    ScoreDuos = SD.open("ScoreDuos.txt", FILE_WRITE);
-      
-      if (ScoreDuos) {
-      Serial.print("Writing to ScoreDuos.txt...");
-      ScoreDuos.print("Score Player 1: ");
-      ScoreDuos.println(String(shipP1.player.score));
-      ScoreDuos.print("Score Player 2: ");
-      ScoreDuos.println(String(shipP2.player.score));
-      // close the file:
-      ScoreDuos.close();
-      Serial.println("done.");
-      } else {
-      // if the file didn't open, print an error:
-      Serial.println("error opening ScoreDuos.txt");
-      }
-  }
-  
+  LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
+  LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
 }
 
 void vidasJ1 (struct entity *sel){
   switch(sel->player.vidas){
     case 3:
         FillRect(39,210,15,15,0x0);
-        boom(explosion_ship, shipP1);
-        H_line(0, 191, 319, 0xFFFF);
         break;
     case 2:
         FillRect(22,210,15,15,0x0);
         FillRect(39,210,15,15,0x0);
-        boom(explosion_ship, shipP1);
-        H_line(0, 191, 319, 0xFFFF);
         break;
     case 1:
         FillRect(5,210,15,15,0x0);
         FillRect(22,210,15,15,0x0);
         FillRect(39,210,15,15,0x0);
-        boom(explosion_ship, shipP1);
-        H_line(0, 191, 319, 0xFFFF);
         break;
     case 0:
         boom(explosion_ship, shipP1);
@@ -752,25 +728,20 @@ void vidasJ2(struct entity *sel)
   {
     case 3:
       FillRect(265,210,15,15,0x0);
-      boom(explosion_ship, shipP2);
-      H_line(0, 191, 319, 0xFFFF);
       break;
     case 2:
       FillRect(282,210,15,15,0x0);
       FillRect(265,210,15,15,0x0);
-      boom(explosion_ship, shipP2);
-      H_line(0, 191, 319, 0xFFFF);
       break;
     case 1:
       FillRect(265,210,15,15,0x0);
       FillRect(282,210,15,15,0x0);
       FillRect(299,210,15,15,0x0);
-      boom(explosion_ship, shipP2);
-      H_line(0, 191, 319, 0xFFFF);
       break;
     case 0:
-      boom(explosion_ship, shipP2);
+      boom(explosion_ship, shipP1);
       H_line(0, 191, 319, 0xFFFF);
+      estado_juego = 3;
       estado_juego = 3;
       break;
     }
@@ -1040,10 +1011,6 @@ void nivel1Solo () {
   hitboxPlayer(&shipP1, &NPCbullet1);
   hitboxPlayer(&shipP1, &NPCbullet2);
 
-  // ---------- nave 2 ----------
-  hitboxPlayer(&shipP2, &NPCbullet1);
-  hitboxPlayer(&shipP2, &NPCbullet2);
-
   // ---------- enemigo 1 ----------
   // up, down, left, right
   if ((shipNPC1.info.flag == 0) || (shipNPC1.info.flag == 3))
@@ -1080,11 +1047,6 @@ void nivel2Solo () {
   hitboxPlayer(&shipP1, &NPCbullet3);
   hitboxPlayer(&shipP1, &NPCbullet4);
   hitboxPlayer(&shipP1, &NPCbullet5);
-
-  // ---------- nave 2 ----------
-  hitboxPlayer(&shipP2, &NPCbullet3);
-  hitboxPlayer(&shipP2, &NPCbullet4);
-  hitboxPlayer(&shipP2, &NPCbullet5);
 
   // ---------- enemigo 3 ----------
   // up, down, left, right
@@ -1140,12 +1102,6 @@ void nivel3Solo () {
   hitboxPlayer(&shipP1, &NPCbullet7);
   hitboxPlayer(&shipP1, &NPCbullet8);
   hitboxPlayer(&shipP1, &NPCbullet9);
-
-  // ---------- nave 2 ----------
-  hitboxPlayer(&shipP2, &NPCbullet6);
-  hitboxPlayer(&shipP2, &NPCbullet7);
-  hitboxPlayer(&shipP2, &NPCbullet8);
-  hitboxPlayer(&shipP2, &NPCbullet9);
 
   // ---------- enemigo 6 ----------
   // up, down, left, right
