@@ -3,91 +3,105 @@
 BluetoothSerial BT_ESP;
 
 //************************ Variables de palanca **********************************
+struct tiempo {
+  unsigned long previo;
+  unsigned long intervalo;
+};
+
+struct dir {
+  unsigned char izq;
+  unsigned char der;
+};
+
+
 struct Boton {
   const uint8_t PIN;
   char caracter;
   bool estado;
+  struct tiempo mils;
 };
-Boton shoot = {18, 'E', 0};
+Boton shoot1 = {18, 'S', 0};
+Boton shoot2 = {19, 'X', 0};
 
 struct Joystick {
   const uint8_t PIN;
   uint16_t volt;
+  struct tiempo mils;
+  struct dir movimiento;
 };
-Joystick ejeX {33, 0};
-Joystick ejeY {32, 0};
+Joystick P1 {33, 0};
+Joystick P2 {32, 0};
 
-void IRAM_ATTR ISR(){
-  shoot.estado = 1;
-  
+void IRAM_ATTR ISR1(){
+  shoot1.estado = 1;
 }
+
+void IRAM_ATTR ISR2(){
+  shoot2.estado = 1;
+}
+
+unsigned long currentMillis;
 
 void setup() {
   Serial.begin(115200);
   BT_ESP.begin("ESP32");
-
-
-  
   input_setup();
-  attachInterrupt(shoot.PIN, ISR, HIGH);
+
+  control_setup();
+  attachInterrupt(shoot1.PIN, ISR1, HIGH);
+  attachInterrupt(shoot2.PIN, ISR2, HIGH);
 }
 
 
 
 void loop() {
-//  BT_ESP.println("Hola mundo");
-//  delay(10000);
-
+  currentMillis = millis();
 
   
-  Joy_function(); 
-  but ();
+  Joy_function (&P1);
+  Joy_function (&P2);
+
+  disparo (&shoot1);
+  disparo (&shoot2);
 }
 
-void input_setup (){
-  pinMode(shoot.PIN, INPUT_PULLUP);
-  pinMode(ejeX.PIN, INPUT);
-  pinMode(ejeY.PIN, INPUT);
-
+void input_setup (){  
+  pinMode(shoot1.PIN, INPUT_PULLUP);
+  pinMode(shoot2.PIN, INPUT_PULLUP);
+  pinMode(P1.PIN, INPUT);
+  pinMode(P2.PIN, INPUT);
 }
 
-void Joy_function () {
-  //lee los valores en eje X y X
-  ejeX.volt = analogRead (ejeX.PIN);
-  ejeY.volt = analogRead (ejeY.PIN);
+void control_setup (){
+  P1.movimiento = {'A', 'D'};
+  P2.movimiento = { 'C', 'Z'};
 
-  //Letra correspondiente de acuerdo a donde se encuentre la palanca
-  if (ejeX.volt > 2500){
-    Serial.print ("D");
-    BT_ESP.print("D");
-    delay(50);
-  }
+  P1.mils = {0, 100};
+  P2.mils = P1.mils;
+}
 
-  if (ejeX.volt < 800) {
-    Serial.print ("A");
-    BT_ESP.print("A");
-    delay(50);
-  }
+void Joy_function (struct Joystick *sel){
+  if (currentMillis - (sel->mils.previo) > (sel->mils.intervalo)){
+    sel->volt = analogRead ((sel->PIN));
 
-  if (ejeY.volt < 800){
-    Serial.print ("W");
-    BT_ESP.print("W");
-    delay(50);
-  }
+    if ((sel->volt) > 2500){
+      Serial.write(sel->movimiento.der);
+      BT_ESP.print(sel->movimiento.der);
+    }
 
-  if (ejeY.volt >2500){
-    Serial.print ("S");
-    BT_ESP.print("S");
-    delay(50);
+    if ((sel->volt) < 800){
+      Serial.write(sel->movimiento.izq);
+      BT_ESP.print(sel->movimiento.izq);
+    }
+    sel->mils.previo = currentMillis;
+  
   }
 }
 
-void but () {
-  if (!digitalRead(shoot.PIN) && shoot.estado){
-    Serial.println(shoot.caracter);
-    BT_ESP.println(shoot.caracter);
-    shoot.estado = 0;
-    //delay(10);
+void disparo (struct Boton *sel){
+  if (!digitalRead(sel->PIN) && (sel->estado)){
+    Serial.print(sel->caracter);
+    BT_ESP.print(sel->caracter);
+    sel->estado = 0;
   }
-  //3.3v > push > pin boton, resistencias > gnd
 }
