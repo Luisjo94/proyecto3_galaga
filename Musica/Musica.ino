@@ -27,7 +27,9 @@
 
 #define rest    -1
 
-int piezo = PD7; // Connect your piezo buzzer to this pin or change it to match your circuit!
+#define piezo PD7
+
+//int piezo = PD7; // Connect your piezo buzzer to this pin or change it to match your circuit!
 int led = LED_BUILTIN; 
 
 volatile int beatlength = 100; // determines tempo
@@ -35,23 +37,26 @@ float beatseparationconstant = 0.3;
 
 int threshold;
 
-int a; // part index
-int b; // song index
-int c; // lyric index
+char a; // part index
+char b; // song index
 
 boolean flag;
 
 // Parts 1 and 2 (Intro)
 
-int song1_intro_melody[] =
+
+//diversas frecuencias para la cancion ee
+const short song1_intro_melody[] =
 {c5s, e5f, e5f, f5, a5f, f5s, f5, e5f, c5s, e5f, rest, a4f, a4f};
 
-int song1_intro_rhythmn[] =
+//duracion de las diversas frecuencias para la cancion ee
+const char song1_intro_rhythmn[] = 
 {6, 10, 6, 6, 1, 1, 1, 1, 6, 10, 4, 2, 10};
 
 // Parts 3 or 5 (Verse 1)
 
-int song1_verse1_melody[] =
+//verso de la cancion
+const short song1_verse1_melody[] =
 { rest, c4s, c4s, c4s, c4s, e4f, rest, c4, b3f, a3f,
   rest, b3f, b3f, c4, c4s, a3f, a4f, a4f, e4f,
   rest, b3f, b3f, c4, c4s, b3f, c4s, e4f, rest, c4, b3f, b3f, a3f,
@@ -60,7 +65,8 @@ int song1_verse1_melody[] =
   rest, b3f, c4, c4s, a3f, rest, e4f, f4, e4f
 };
 
-int song1_verse1_rhythmn[] =
+//duracion de los versos
+const char song1_verse1_rhythmn[] =
 { 2, 1, 1, 1, 1, 2, 1, 1, 1, 5,
   1, 1, 1, 1, 3, 1, 2, 1, 5,
   1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
@@ -69,18 +75,9 @@ int song1_verse1_rhythmn[] =
   2, 1, 1, 1, 3, 1, 1, 1, 3
 };
 
-const char* lyrics_verse1[] =
-{ "We're ", "no ", "strangers ", "", "to ", "love ", "", "\r\n",
-  "You ", "know ", "the ", "rules ", "and ", "so ", "do ", "I\r\n",
-  "A ", "full ", "commitment's ", "", "", "what ", "I'm ", "thinking ", "", "of", "\r\n",
-  "You ", "wouldn't ", "", "get ", "this ", "from ", "any ", "", "other ", "", "guy\r\n",
-  "I ", "just ", "wanna ", "", "tell ", "you ", "how ", "I'm ", "feeling", "\r\n",
-  "Gotta ", "", "make ", "you ", "understand", "", "\r\n"
-};
-
 // Parts 4 or 6 (Chorus)
 
-int song1_chorus_melody[] =
+const short song1_chorus_melody[] =
 { b4f, b4f, a4f, a4f,
   f5, f5, e5f, b4f, b4f, a4f, a4f, e5f, e5f, c5s, c5, b4f,
   c5s, c5s, c5s, c5s,
@@ -91,7 +88,7 @@ int song1_chorus_melody[] =
   c5s, e5f, c5, b4f, a4f, rest, a4f, e5f, c5s, rest
 };
 
-int song1_chorus_rhythmn[] =
+const char song1_chorus_rhythmn[] =
 { 1, 1, 1, 1,
   3, 3, 6, 1, 1, 1, 1, 3, 3, 3, 1, 2,
   1, 1, 1, 1,
@@ -102,14 +99,6 @@ int song1_chorus_rhythmn[] =
   3, 3, 3, 1, 2, 2, 2, 4, 8, 4
 };
 
-const char* lyrics_chorus[] =
-{ "Never ", "", "gonna ", "", "give ", "you ", "up\r\n",
-  "Never ", "", "gonna ", "", "let ", "you ", "down", "", "\r\n",
-  "Never ", "", "gonna ", "", "run ", "around ", "", "", "", "and ", "desert ", "", "you\r\n",
-  "Never ", "", "gonna ", "", "make ", "you ", "cry\r\n",
-  "Never ", "", "gonna ", "", "say ", "goodbye ", "", "", "\r\n",
-  "Never ", "", "gonna ", "", "tell ", "a ", "lie ", "", "", "and ", "hurt ", "you\r\n"
-};
 
 void setup()
 {
@@ -121,13 +110,11 @@ void setup()
   flag = true;
   a = 4;
   b = 0;
-  c = 0;
+
 }
 
 void loop()
 {
-
-
   // play next step in song
   if (flag == true) {
     play();
@@ -135,58 +122,66 @@ void loop()
 }
 
 void play() {
-  int notelength;
+  unsigned short notelength;
+  //primera parte de la cancion, se repite dos veces
   if (a == 1 || a == 2) {
     // intro
     notelength = beatlength * song1_intro_rhythmn[b];
     if (song1_intro_melody[b] > 0) {
-      digitalWrite(led, HIGH);
+      //digitalWrite(led, HIGH);
       tone(piezo, song1_intro_melody[b], notelength);
     }
     b++;
     if (b >= sizeof(song1_intro_melody) / sizeof(int)) {
       a++;
       b = 0;
-      c = 0;
+
     }
   }
+
+  //se repite tres veces cuando a=3 y a=5
   else if (a == 3 || a == 5) {
     // verse
     notelength = beatlength * 2 * song1_verse1_rhythmn[b];
     if (song1_verse1_melody[b] > 0) {
-      digitalWrite(led, HIGH);
-      Serial.print(lyrics_verse1[c]);
+      //digitalWrite(led, HIGH);
+      //Serial.print(lyrics_verse1[c]); son las lyrics, no importan
       tone(piezo, song1_verse1_melody[b], notelength);
-      c++;
+
     }
     b++;
     if (b >= sizeof(song1_verse1_melody) / sizeof(int)) {
       a++;
       b = 0;
-      c = 0;
+
     }
   }
+
+  //parte 4 y 6
   else if (a == 4 || a == 6) {
     // chorus
     notelength = beatlength * song1_chorus_rhythmn[b];
     if (song1_chorus_melody[b] > 0) {
-      digitalWrite(led, HIGH);
-      Serial.print(lyrics_chorus[c]);
+      //digitalWrite(led, HIGH);
+      //Serial.print(lyrics_chorus[c]);
       tone(piezo, song1_chorus_melody[b], notelength);
-      c++;
+
     }
     b++;
     if (b >= sizeof(song1_chorus_melody) / sizeof(int)) {
       Serial.println("");
       a++;
       b = 0;
-      c = 0;
+
     }
   }
+  
   delay(notelength);
   noTone(piezo);
   digitalWrite(led, LOW);
   delay(notelength * beatseparationconstant);
+
+  //finalizacion dela cancion
   if (a == 7) { // loop back around to beginning of song
     a = 1;
   }
