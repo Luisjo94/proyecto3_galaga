@@ -532,6 +532,9 @@ void SetupMenu (){
   //Ventana un jugador
   Rect (7, 70, 143, 65, 0xFFFF);
   LCD_Print ("Solo", 50, 62, 2, 0xFFFF, 0x0);
+
+
+  LCD_Print ("Highscore: 45", 30, 120, 1, 0xFFFF, 0x0);
   LCD_Bitmap (70, 100, 15, 15, nave1);
 
   //ventana dos jugadores
@@ -539,6 +542,9 @@ void SetupMenu (){
   LCD_Print ("Duos", 210, 62, 2, 0xFFFF, 0x0);
   LCD_Bitmap (215, 100, 15, 15, nave1);
   LCD_Bitmap (245, 100, 15, 15, nave2);
+//
+//  LCD_Print ("WP1:", 180, 120, 1, 0xFFFF, 0x0);
+//  LCD_Print ("WP2:", 240, 120, 1, 0xFFFF, 0x0);
 
 
   //condiciones iniciales de las naves
