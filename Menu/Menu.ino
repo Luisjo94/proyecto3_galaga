@@ -133,6 +133,7 @@ struct entity NPCbullet9;
 char estado_juego = 0; //al reainiciar es el estado default, pantalla de inicio
 char start = 1; //bandera para cargar el menu
 char duos_flag = 0;
+int score;
 // 1, solo
 // 2, duos
 // 3, endgame
@@ -270,7 +271,6 @@ void loop() {
 
       // ****************************** SOLO MODE ******************************
       case 1:
-      int a;
       // ---------- map setup ----------
         if (start){
           SetupSolo ();
@@ -292,7 +292,6 @@ void loop() {
         if (shipP1.player.score >= 0 && shipP1.player.score < 10)
         {
           nivel1Solo();
-          a = 1;
         }
         else if (shipP1.player.score >= 10 && shipP1.player.score < 25)
         {
@@ -335,15 +334,28 @@ void loop() {
 
         // ---------- puntos ----------
         ScoreDuosMode(shipP1.player.score, shipP2.player.score);
+        
+        
+        score = shipP1.player.score + shipP2.player.score;
 
-        // ---------- generacion de enemigos ----------
-        /*
-        while (shipP1.player.vidas>0 && shipP2.player.vidas>0)
+
+       // ---------- niveles ----------
+        if ((score>=0) && (score<10))
         {
-          /* code 
+          nivel1Solo();
         }
-        */
-
+        else if ((score>=10) && (score<25))
+        {
+          nivel2Solo();
+        }
+        else if ((score>=25) && (score<45))
+        {
+          nivel3Solo();
+        }
+        else 
+        {
+          estado_juego = 4;
+        }
 
         break;
 
@@ -535,6 +547,50 @@ void SetupDuos (){
  spawn_ship (nave2, &shipP2);
 
  // ********** balas **********
+ // ********** enemigos **********
+  shipNPC1.dimension = {15,15};
+  shipNPC1.limites.maxiX = 303;
+  shipNPC1.mils.interval = 5;
+
+  shipNPC2.pos = {303, 50};
+  shipNPC2.dimension = {15,15};
+  shipNPC2.limites.maxiX = 303;
+  shipNPC2.mils.interval = 10;
+
+  shipNPC3.pos = {303, 30};
+  shipNPC3.dimension = {15,15};
+  shipNPC3.limites.maxiX = 303;
+  shipNPC3.mils.interval = 15;
+
+  shipNPC4.pos = {0, 70};
+  shipNPC4.dimension = {15,15};
+  shipNPC4.limites.maxiX = 303;
+  shipNPC4.mils.interval = 15;
+
+  shipNPC5.pos = {303, 110};
+  shipNPC5.dimension = {15,15};
+  shipNPC5.limites.maxiX = 303;
+  shipNPC5.mils.interval = 15;
+
+  shipNPC6.pos = {303, 30};
+  shipNPC6.dimension = {15,15};
+  shipNPC6.limites.maxiX = 303;
+  shipNPC6.mils.interval = 15;
+
+  shipNPC7.pos = {0, 60};
+  shipNPC7.dimension = {15,15};
+  shipNPC7.limites.maxiX = 303;
+  shipNPC7.mils.interval = 5;
+
+  shipNPC8.pos = {303, 90};
+  shipNPC8.dimension = {15,15};
+  shipNPC8.limites.maxiX = 303;
+  shipNPC8.mils.interval = 5;
+
+  shipNPC9.pos = {0, 120};
+  shipNPC9.dimension = {15,15};
+  shipNPC9.limites.maxiX = 303;
+  shipNPC9.mils.interval = 5;
 }
 
 void GameOver(void)
@@ -558,9 +614,19 @@ void GameOver(void)
 void Winner(void)
 {
   LCD_Clear(0x0);
+  LCD_Bitmap(144, 50, 32, 32, win);
   LCD_Print("Congratulations!", 30, 100, 2, 0xFFFF, 0x0);
-  LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
-  LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+  if (!duos_flag){
+    LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
+    LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+  }
+  else{
+    LCD_Print("Score Player 1:", 20, 130, 1, 0xFFFF, 0x0);
+    LCD_Print("Score Player 2:", 180, 130, 1, 0xFFFF, 0x0);
+    LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
+    LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
+  }
+  
 }
 
 void vidasJ1 (struct entity *sel){
@@ -861,6 +927,10 @@ void nivel1Solo () {
   hitboxPlayer(&shipP1, &NPCbullet1);
   hitboxPlayer(&shipP1, &NPCbullet2);
 
+  // ---------- nave 2 ----------
+  hitboxPlayer(&shipP2, &NPCbullet1);
+  hitboxPlayer(&shipP2, &NPCbullet2);
+
   // ---------- enemigo 1 ----------
   // up, down, left, right
   if ((shipNPC1.info.flag == 0) || (shipNPC1.info.flag == 3))
@@ -897,6 +967,11 @@ void nivel2Solo () {
   hitboxPlayer(&shipP1, &NPCbullet3);
   hitboxPlayer(&shipP1, &NPCbullet4);
   hitboxPlayer(&shipP1, &NPCbullet5);
+
+  // ---------- nave 2 ----------
+  hitboxPlayer(&shipP2, &NPCbullet3);
+  hitboxPlayer(&shipP2, &NPCbullet4);
+  hitboxPlayer(&shipP2, &NPCbullet5);
 
   // ---------- enemigo 3 ----------
   // up, down, left, right
@@ -952,6 +1027,12 @@ void nivel3Solo () {
   hitboxPlayer(&shipP1, &NPCbullet7);
   hitboxPlayer(&shipP1, &NPCbullet8);
   hitboxPlayer(&shipP1, &NPCbullet9);
+
+  // ---------- nave 2 ----------
+  hitboxPlayer(&shipP2, &NPCbullet6);
+  hitboxPlayer(&shipP2, &NPCbullet7);
+  hitboxPlayer(&shipP2, &NPCbullet8);
+  hitboxPlayer(&shipP2, &NPCbullet9);
 
   // ---------- enemigo 6 ----------
   // up, down, left, right
