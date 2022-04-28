@@ -213,6 +213,8 @@ void setup() {
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
 
+  Serial2.begin(115200);
+
 
 }
 
@@ -329,6 +331,7 @@ void loop() {
         LCD_Clear(0x00);
 
         start = 0;
+        Serial2.print('r');
         }
         for (int i=0; i<6; i++){
         LCD_Sprite (100,70,120,110, ee, 6, i,0,0);
@@ -397,6 +400,8 @@ void SetupMenu (){
   NPCbullet2 = NPCbullet1;
   //aparecer la nave 1
   spawn_ship (nave1, &shipP1);
+
+  Serial2.print('t');
 
 }
 
@@ -476,10 +481,12 @@ void GameOver(void)
       LCD_Print("Score Player 2:", 180, 130, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP1.player.score), 80, 150, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP2.player.score), 230, 150, 1, 0xFFFF, 0x0);
+      Serial2.print('y');
   }
   else{
       LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
       LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
+      Serial2.print('y');
   }
 }
 
@@ -647,6 +654,7 @@ void move_NPC (const unsigned char tipo [], struct entity *sel, char direccion){
 void shoot_player (const unsigned char tipo[], struct entity sel_ref, struct entity *sel){
   //generar el disparo
   if (!digitalRead(SW1) && !digitalRead(SW2) && !(sel->info.active)){
+    Serial2.print('u');
     sel->pos.ejeX = (sel_ref.pos.ejeX) + 6;
     sel->pos.ejeY = (sel_ref.pos.ejeY) - (sel->dimension.alto);
     sel->info.active = 1;
@@ -752,6 +760,7 @@ void hitboxPlayer (struct entity *tetano, struct entity *bala){
 
 void boom (const unsigned char tipo[], struct entity sel){
   //Rect ((sel.pos.ejeX)-12, sel.pos.ejeY, 32, 32, 0x0);
+  Serial2.print('i');
   for (char i = 0; i < 5; i++){
     LCD_Sprite((sel.pos.ejeX) - 12, sel.pos.ejeY, 32, 32, tipo, 5, i, 0, 0);
     delay(60);
