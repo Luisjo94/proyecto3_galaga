@@ -36,6 +36,12 @@
 #include "lcd_registers.h"
 
 
+#include <SPI.h>
+#include <SD.h>
+
+File vidas;
+
+
 #define SW1 PF_4
 #define SW2 PF_0
 
@@ -147,6 +153,9 @@ char duos_flag = 0;
 //  3.1 tiene highscore
 //  3.2 no tiene highscore
 
+String v;
+char ojala_funcione;
+
 
 //------------------- tiempo --------------------------
 
@@ -218,6 +227,40 @@ unsigned long currentMillis;
 void setup() {
   SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
   Serial.begin(115200);
+
+//coso nuevo
+  SPI.setModule (0);
+
+  if (!SD.begin(4)) {
+    Serial.println("Ha ocurrido un error en la inicializacion");
+    return;
+  }
+  Serial.println("Inicializacion completa.");
+
+  vidas = SD.open("vidas.txt");
+  if (vidas) {
+    Serial.println("vidas.txt:");
+
+    // read from the file until there's nothing else in it:
+    while (vidas.available()) {
+      Serial.write(vidas.read());
+      v = vidas.read();
+    }
+    // close the file:
+    vidas.close();
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening vidas.txt");
+  }
+
+  ojala_funcione = (v.toInt()) -7;
+
+  shipP1.player.vidas = ojala_funcione;
+
+
+
+  
+  //--------------------------
   GPIOPadConfigSet(GPIO_PORTB_BASE, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
   Serial.println("Inicio");
   LCD_Init();
@@ -504,7 +547,8 @@ void SetupMenu (){
   shipP1.dimension = {15, 15};
   shipP1.pos = {155, 170};
   shipP1.mils = {0, 5};
-  shipP1.player = {0, 3};
+  shipP1.player.score = 0;
+  //shipP1.player = {0, 3};
   shipP1.limites = {0,304, 0, 250};
   shipP1.actions = {0,0,0};
 
@@ -739,7 +783,7 @@ void vidasJ2(struct entity *sel)
       FillRect(299,210,15,15,0x0);
       break;
     case 0:
-      boom(explosion_ship, shipP1);
+      boom(explosion_ship, shipP2);
       H_line(0, 191, 319, 0xFFFF);
       estado_juego = 3;
       estado_juego = 3;
