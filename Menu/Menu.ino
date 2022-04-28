@@ -107,6 +107,9 @@ struct entity shipNPC3;
 struct entity shipNPC4;
 struct entity shipNPC5;
 struct entity shipNPC6;
+struct entity shipNPC7;
+struct entity shipNPC8;
+struct entity shipNPC9;
 
 //balas
 struct entity bulletP1;
@@ -119,6 +122,9 @@ struct entity NPCbullet3;
 struct entity NPCbullet4;
 struct entity NPCbullet5;
 struct entity NPCbullet6;
+struct entity NPCbullet7;
+struct entity NPCbullet8;
+struct entity NPCbullet9;
 
 
 
@@ -232,6 +238,7 @@ void loop() {
       if (start){
         SetupMenu();
         start = 0;
+        //delay(6800);
       }
       setup_P1 ();
 
@@ -281,8 +288,24 @@ void loop() {
         ScoreSoloMode(shipP1.player.score);
 
         // ---------- niveles ----------
-       // if ()
-        nivel1Solo();
+        if (shipP1.player.score >= 0 && shipP1.player.score < 10)
+        {
+          nivel1Solo();
+        }
+        else if (shipP1.player.score >= 10 && shipP1.player.score < 25)
+        {
+          LCD_Print("2", 200, 200, 2, 0xFFFF, 0x0);
+          nivel2Solo();
+        }
+        else if (shipP1.player.score >= 25 && shipP1.player.score < 45)
+        {
+          LCD_Print("3", 200, 200, 2, 0xFFFF, 0x0);
+          nivel3Solo();
+        }
+        else 
+        {
+          estado_juego = 4;
+        }
 
 
 
@@ -322,6 +345,13 @@ void loop() {
         if (!start){
             GameOver();
             start = 2;
+        }
+        break;
+
+    case 4:
+        if (!start){
+          Winner();
+          start = 2;
         }
         break;
 
@@ -398,6 +428,14 @@ void SetupMenu (){
   NPCbullet1.player = {0,8}; //el 8 sirve para identificar que es bala enemiga
 
   NPCbullet2 = NPCbullet1;
+  NPCbullet3 = NPCbullet1;
+  NPCbullet4 = NPCbullet1;
+  NPCbullet5 = NPCbullet1;
+  NPCbullet6 = NPCbullet1;
+  NPCbullet7 = NPCbullet1;
+  NPCbullet8 = NPCbullet1;
+  NPCbullet9 = NPCbullet1;
+
   //aparecer la nave 1
   spawn_ship (nave1, &shipP1);
 
@@ -410,7 +448,7 @@ void SetupSolo () {
   LCD_Clear(0x0);
   H_line(0, 191, 319, 0xFFFF);
 // ********** text **********
-  LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+  LCD_Print("Level 1", 105, 200, 2, 0xFFFF, 0x0000);
   LCD_Print("Solo Mode", 5, 195, 1, 0xFFFF, 0x0000);
   LCD_Print("Score:", 260, 195, 1, 0xFFFF, 0x0000);
 // ********** vidas J1 **********
@@ -424,26 +462,46 @@ void SetupSolo () {
   shipNPC1.dimension = {15,15};
   shipNPC1.limites.maxiX = 303;
   shipNPC1.mils.interval = 5;
+
   shipNPC2.pos = {303, 50};
   shipNPC2.dimension = {15,15};
   shipNPC2.limites.maxiX = 303;
   shipNPC2.mils.interval = 10;
-  shipNPC3.pos = {303, 50};
+
+  shipNPC3.pos = {303, 30};
   shipNPC3.dimension = {15,15};
   shipNPC3.limites.maxiX = 303;
-  shipNPC3.mils.interval = 5;
-  shipNPC4.pos = {303, 50};
+  shipNPC3.mils.interval = 15;
+
+  shipNPC4.pos = {0, 70};
   shipNPC4.dimension = {15,15};
   shipNPC4.limites.maxiX = 303;
-  shipNPC4.mils.interval = 5;
-  shipNPC5.pos = {303, 50};
+  shipNPC4.mils.interval = 15;
+
+  shipNPC5.pos = {303, 110};
   shipNPC5.dimension = {15,15};
   shipNPC5.limites.maxiX = 303;
-  shipNPC5.mils.interval = 5;
-  shipNPC6.pos = {303, 50};
+  shipNPC5.mils.interval = 15;
+
+  shipNPC6.pos = {303, 30};
   shipNPC6.dimension = {15,15};
   shipNPC6.limites.maxiX = 303;
-  shipNPC6.mils.interval = 5;
+  shipNPC6.mils.interval = 15;
+
+  shipNPC7.pos = {0, 60};
+  shipNPC7.dimension = {15,15};
+  shipNPC7.limites.maxiX = 303;
+  shipNPC7.mils.interval = 5;
+
+  shipNPC8.pos = {303, 90};
+  shipNPC8.dimension = {15,15};
+  shipNPC8.limites.maxiX = 303;
+  shipNPC8.mils.interval = 5;
+
+  shipNPC9.pos = {0, 120};
+  shipNPC9.dimension = {15,15};
+  shipNPC9.limites.maxiX = 303;
+  shipNPC9.mils.interval = 5;
 }
 
 void SetupDuos (){
@@ -488,6 +546,14 @@ void GameOver(void)
       LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
       Serial2.print('y');
   }
+}
+
+void Winner(void)
+{
+  LCD_Clear(0x0);
+  LCD_Print("Congratulations!", 30, 100, 2, 0xFFFF, 0x0);
+  LCD_Print("Score Player 1:", 100, 130, 1, 0xFFFF, 0x0);
+  LCD_Print(String(shipP1.player.score), 160, 150, 1, 0xFFFF, 0x0);
 }
 
 void vidasJ1 (struct entity *sel){
@@ -817,6 +883,125 @@ void nivel1Solo () {
   hitboxNPC(&shipNPC2, &bulletP1, &shipP1);
 }
 
+
+
+void nivel2Solo () {
+  // ---------- nave 1 ----------
+  hitboxPlayer(&shipP1, &NPCbullet3);
+  hitboxPlayer(&shipP1, &NPCbullet4);
+  hitboxPlayer(&shipP1, &NPCbullet5);
+
+  // ---------- enemigo 3 ----------
+  // up, down, left, right
+  if ((shipNPC3.info.flag == 0) || (shipNPC3.info.flag == 4))
+  {
+    move_NPC(enemy3, &shipNPC3, LEFT);
+  }
+  if (shipNPC3.info.flag == 3)
+  {
+    move_NPC(enemy3, &shipNPC3, RIGHT);
+  }
+  shoot_NPC(bulletE, shipNPC3, &NPCbullet3, 15);
+  disparo_volando(bulletE, &NPCbullet3);
+  hitboxNPC(&shipNPC3, &bulletP1, &shipP1);
+
+  // ---------- enemigo 4 ----------
+  // up, down, left, right
+  if ((shipNPC4.info.flag == 0) || (shipNPC4.info.flag == 3))
+  {
+    move_NPC(enemy1, &shipNPC4, RIGHT);
+  }
+  if (shipNPC4.info.flag == 4)
+  {
+    move_NPC(enemy1, &shipNPC4, LEFT);
+  }
+  shoot_NPC(bulletE, shipNPC4, &NPCbullet4, 15);
+  disparo_volando(bulletE, &NPCbullet4);
+  hitboxNPC(&shipNPC4, &bulletP1, &shipP1);
+
+  // ---------- enemigo 5 ----------
+  // up, down, left, right
+  if ((shipNPC5.info.flag == 0) || (shipNPC5.info.flag == 4))
+  {
+    move_NPC(enemy2, &shipNPC5, LEFT);
+  }
+  if (shipNPC5.info.flag == 3)
+  {
+    move_NPC(enemy2, &shipNPC5, RIGHT);
+  }
+  shoot_NPC(bulletE, shipNPC5, &NPCbullet5, 15);
+  disparo_volando(bulletE, &NPCbullet5);
+  hitboxNPC(&shipNPC5, &bulletP1, &shipP1);
+}
+
+
+
+
+
+
+void nivel3Solo () {
+  // ---------- nave 1 ----------
+  hitboxPlayer(&shipP1, &NPCbullet6);
+  hitboxPlayer(&shipP1, &NPCbullet7);
+  hitboxPlayer(&shipP1, &NPCbullet8);
+  hitboxPlayer(&shipP1, &NPCbullet9);
+
+  // ---------- enemigo 6 ----------
+  // up, down, left, right
+  if ((shipNPC6.info.flag == 0) || (shipNPC6.info.flag == 4))
+  {
+    move_NPC(enemy3, &shipNPC6, LEFT);
+  }
+  if (shipNPC6.info.flag == 3)
+  {
+    move_NPC(enemy3, &shipNPC6, RIGHT);
+  }
+  shoot_NPC(bulletE, shipNPC6, &NPCbullet6, 15);
+  disparo_volando(bulletE, &NPCbullet6);
+  hitboxNPC(&shipNPC6, &bulletP1, &shipP1);
+
+  // ---------- enemigo 7 ----------
+  // up, down, left, right
+  if ((shipNPC7.info.flag == 0) || (shipNPC7.info.flag == 3))
+  {
+    move_NPC(enemy1, &shipNPC7, RIGHT);
+  }
+  if (shipNPC7.info.flag == 4)
+  {
+    move_NPC(enemy1, &shipNPC7, LEFT);
+  }
+  shoot_NPC(bulletE, shipNPC7, &NPCbullet7, 15);
+  disparo_volando(bulletE, &NPCbullet7);
+  hitboxNPC(&shipNPC7, &bulletP1, &shipP1);
+
+  // ---------- enemigo 8 ----------
+  // up, down, left, right
+  if ((shipNPC8.info.flag == 0) || (shipNPC8.info.flag == 4))
+  {
+    move_NPC(enemy2, &shipNPC8, LEFT);
+  }
+  if (shipNPC8.info.flag == 3)
+  {
+    move_NPC(enemy2, &shipNPC8, RIGHT);
+  }
+  shoot_NPC(bulletE, shipNPC8, &NPCbullet5, 15);
+  disparo_volando(bulletE, &NPCbullet8);
+  hitboxNPC(&shipNPC8, &bulletP1, &shipP1);
+
+  // ---------- enemigo 9 ----------
+  // up, down, left, right
+  if ((shipNPC9.info.flag == 0) || (shipNPC9.info.flag == 3))
+  {
+    move_NPC(enemy4, &shipNPC9, RIGHT);
+  }
+  if (shipNPC9.info.flag == 4)
+  {
+    move_NPC(enemy2, &shipNPC9, LEFT);
+  }
+  shoot_NPC(bulletE, shipNPC9, &NPCbullet5, 15);
+  disparo_volando(bulletE, &NPCbullet9);
+  hitboxNPC(&shipNPC9, &bulletP1, &shipP1);
+}
 
 
 
