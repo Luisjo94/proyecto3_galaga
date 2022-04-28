@@ -390,9 +390,11 @@ void SetupMenu (){
   bulletP2 = bulletP1;
 
   NPCbullet1 = bulletP1;
+  
   NPCbullet1.mils = {0,15};
   NPCbullet1.player = {0,8}; //el 8 sirve para identificar que es bala enemiga
 
+  NPCbullet2 = NPCbullet1;
   //aparecer la nave 1
   spawn_ship (nave1, &shipP1);
 
@@ -420,7 +422,7 @@ void SetupSolo () {
   shipNPC2.pos = {303, 50};
   shipNPC2.dimension = {15,15};
   shipNPC2.limites.maxiX = 303;
-  shipNPC2.mils.interval = 5;
+  shipNPC2.mils.interval = 10;
   shipNPC3.pos = {303, 50};
   shipNPC3.dimension = {15,15};
   shipNPC3.limites.maxiX = 303;
