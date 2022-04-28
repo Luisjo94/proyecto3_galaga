@@ -280,8 +280,9 @@ void loop() {
         // ---------- puntos ----------
         ScoreSoloMode(shipP1.player.score);
 
+        // ---------- niveles ----------
+       // if ()
         nivel1Solo();
-
 
 
 
@@ -311,8 +312,7 @@ void loop() {
         ScoreDuosMode(shipP1.player.score, shipP2.player.score);
 
         // ---------- enemigos ----------
-        shipNPC1.pos = {0, 100};
-        move_NPC(enemy1, &shipNPC1, RIGHT);
+        
 
 
         break;
@@ -450,8 +450,8 @@ void SetupDuos (){
     //lineas
   LCD_Clear(0x0);
   H_line(0, 191, 319, 0xFFFF);
-// ********** text **********
-  LCD_Print("Nivel 1", 105, 200, 2, 0xFFFF, 0x0000);
+// ********** text ********** 
+ LCD_Print(" DUOS! ", 105, 200, 2, 0xFFFF, 0x0000);
  LCD_Print("Score:", 5, 195, 1, 0xFFFF, 0x0000);
  LCD_Print("Score:", 240, 195, 1, 0xFFFF, 0x0000);
 
@@ -748,7 +748,7 @@ void shoot_NPC (const unsigned char tipo[], struct entity sel_ref, struct entity
 
 
 void hitboxPlayer (struct entity *tetano, struct entity *bala){
-  if (bala->pos.ejeY >= ((tetano->pos.ejeY) - (tetano->dimension.alto)) && bala->pos.ejeY >= tetano->pos.ejeY){
+  if (bala->pos.ejeY >= ((tetano->pos.ejeY) - (tetano->dimension.alto)) && bala->pos.ejeY+8 < tetano->pos.ejeY){
     if (((bala->pos.ejeX) + (bala->dimension.ancho) <= ((tetano->pos.ejeX) + (tetano->dimension.ancho))) && (bala->pos.ejeX >= tetano->pos.ejeX)){
       (tetano->player.vidas)--;
       bala->info.hit=1;
