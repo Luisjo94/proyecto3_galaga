@@ -486,14 +486,32 @@ void loop() {
         if (!start){
             GameOver();
             start = 2;
+            LCD_Print ("Restart to play again", 20, 210, 1, 0xFFFF, 0x0);
         }
+//        if (shipP1.actions.disp == 1 || shipP2.actions.disp == 1){
+//          shipP1.actions.disp = 0;
+//          shipP2.actions.disp = 0;
+//          
+//          estado_juego = 0;
+//          start = 1;
+//          
+//        }
         break;
 
     case 4:
         if (!start){
           Winner();
           start = 2;
+          LCD_Print ("Restart to play again", 20, 210, 1, 0xFFFF, 0x0);
         }
+
+//        if (shipP1.actions.disp == 1 || shipP2.actions.disp == 1){
+//          shipP1.actions.disp = 0;
+//          shipP2.actions.disp = 0;
+//          
+//          estado_juego = 0;
+//          start = 1;
+//        }
         break;
 
 
@@ -607,6 +625,7 @@ void SetupSolo () {
   //LCD_Bitmap(39,210,15,15,nave1);
 // ********** nave J1 **********
   shipP1.pos = {155, 170};
+  shipP1.player.vidas = 3;
   spawn_ship (nave1, &shipP1);
 // ********** enemigos **********
   shipNPC1.dimension = {15,15};
@@ -658,6 +677,9 @@ void SetupDuos (){
     //lineas
   LCD_Clear(0x0);
   H_line(0, 191, 319, 0xFFFF);
+
+  shipP1.player.vidas = 3;
+  shipP2.player.vidas = shipP2.player.vidas;
 // ********** text ********** 
  LCD_Print(" DUOS! ", 105, 200, 2, 0xFFFF, 0x0000);
  LCD_Print("Score:", 5, 195, 1, 0xFFFF, 0x0000);
