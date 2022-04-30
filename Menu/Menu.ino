@@ -443,6 +443,7 @@ void loop() {
         if (!start){
             GameOver();
             start = 2;
+            LCD_Print ("Pres restart to play again", 20, 210, 1, 0xFFFF, 0x0);
         }
         break;
 
@@ -450,6 +451,7 @@ void loop() {
         if (!start){
           Winner();
           start = 2;
+          LCD_Print ("Pres restart to play again", 20, 210, 1, 0xFFFF, 0x0);
         }
         break;
 
